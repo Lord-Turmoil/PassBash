@@ -1,40 +1,36 @@
 /******************************************************************************
  ***                        T O N Y ' S  S T U D I O                        ***
  ******************************************************************************
- *                   Project Name : PassBash                                  *
+ *                   Project Name : TEA                                       *
  *                                                                            *
- *                      File Name : Test.h                                    *
+ *                      File Name : tea.h                                     *
  *                                                                            *
  *                     Programmer : Tony Skywalker                            *
  *                                                                            *
- *                     Start Date : January 15, 2023                          *
+ *                     Start Date : January 16, 2023                          *
  *                                                                            *
  *                    Last Update :                                           *
  *                                                                            *
  * -------------------------------------------------------------------------- *
  * Over View:                                                                 *
- *   For test info.                                                           *
+ *   For TEA encryption core algorithm.                                       *
  * -------------------------------------------------------------------------- *
  * Build Environment:                                                         *
  *   Windows 11 Pro                                                           *
  *   Visual Studio 2022 Community Preview                                     *
  ******************************************************************************/
 
-#ifndef _TEST_H_
-#define _TEST_H_
 
-#include "Macros.h"
+#ifndef _TEA_H_
+#define _TEA_H_
 
-#ifdef PASH_TEST
+#include "inc/tea_core.h"
+#include "inc/tea_util.h"
 
-// Ahh... #define can not nest #define
-#define TEST(PROJ) PASH_TEST_##PROJ
-
-#define PASH_TEST_ORDERED_LIST 0	// Passed
-#define PASH_TEST_TEA          0	// Passed
-#define PASH_TEST_LOGGER       0	// Passed
-#define PASH_TEST_PASSDOC      1
-
+#if defined(DEBUG) || defined(_DEBUG)
+#pragma comment(lib, "tea_b.lib")
+#else
+#pragma comment(lib, "tea.lib")
 #endif
 
 #endif

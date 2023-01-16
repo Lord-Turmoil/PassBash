@@ -233,24 +233,27 @@ void SetTextAttribute(const TextAttribute& attr, TextAttribute* old)
 {
 	if (old)
 		*old = gConsoleInfo.attr;
-
 	gConsoleInfo.attr = attr;
+	
+	ApplyTextAttribute();
 }
 
 WORD SetTextForeground(const WORD foreground)
 {
 	WORD old = gConsoleInfo.attr.foreground;
-	
 	gConsoleInfo.attr.foreground = foreground;
-	
+
+	ApplyTextAttribute();
+
 	return old;
 }
 
 WORD SetTextBackground(const WORD background)
 {
 	WORD old = gConsoleInfo.attr.background;
-
 	gConsoleInfo.attr.background = background;
+
+	ApplyTextAttribute();
 
 	return old;
 }
@@ -259,6 +262,7 @@ void RestoreTextAttribute()
 {
 	SetTextForeground(DFL_FOREGROUND);
 	SetTextBackground(DFL_BACKGROUND);
+	ApplyTextAttribute();
 }
 
 

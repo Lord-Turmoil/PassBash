@@ -23,11 +23,30 @@
 #ifndef _ENTRY_H_
 #define _ENTRY_H_
 
+#include "../common/Macros.h"
+#include "../utility/IntrusiveList.h"
+
 #include <string>
 
-class Entry final
+DECLARE_CLASS(Entry)
+
+class Entry : private IntrusiveListValue<EntryPtr>
 {
-	friend class CompareEntry;
+	friend class EntryPtrCompare;
+	friend class IntrusiveList<EntryPtr>;
+public:
+	class EntryPtrCompare
+	{
+	public:
+		bool operator()(const EntryPtr& lhs, const EntryPtr& rhs)
+		{
+			if (lhs->m_weight == rhs->m_weight)
+				return lhs->m_key < rhs->m_key;
+			else
+				return lhs->m_weight < rhs->m_weight;
+		};
+	};
+
 public:
 	Entry(const std::string& key, const std::string& value, int weight) :
 		m_key(key), m_value(value), m_weight(weight) {}
@@ -37,9 +56,11 @@ public:
 
 	void Key   (const std::string& key)   { m_key = key; }
 	void Value (const std::string& value) { m_value = value; }
+	void Weight(int weight)               { m_weight = weight; }
 
-	const std::string& Key()   const { return m_key; }
-	const std::string& Value() const { return m_value; }
+	const std::string& Key()    const { return m_key; }
+	const std::string& Value()  const { return m_value; }
+	int                Weight() const { return m_weight; }
 
 	void Set(const std::string& key, const std::string& value)
 	{
@@ -56,18 +77,6 @@ private:
 	std::string m_key;
 	std::string m_value;
 	int m_weight;	// for sorting
-};
-
-class CompareEntry
-{
-public:
-	bool operator()(const Entry& lhs, const Entry& rhs)
-	{
-		if (lhs.m_weight == rhs.m_weight)
-			return lhs.m_key < rhs.m_key;
-		else
-			return lhs.m_weight < rhs.m_weight;
-	};
 };
 
 #endif

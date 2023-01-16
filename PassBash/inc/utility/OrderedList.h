@@ -28,16 +28,19 @@
 
 #include "IntrusiveList.h"
 
-// Ordered list is based on intrusive list.
-template<typename _PtrTy, class _Pr>
+// Ordered list is based on intrusive list. It uses statble sort.
+template<typename _PtrTy, class _Compare>
 class OrderedList
 {
 public:
 	using value_type    = typename std::pointer_traits<_PtrTy>::pointer;
 	using pointer       = value_type*;
 	using reference     = value_type&;
-	using value_compare = _Pr;
+	using value_compare = _Compare;
 	using container     = IntrusiveList<_PtrTy>;
+
+	OrderedList() {}
+	~OrderedList() { Clear(); }
 
 	void Insert(reference child)
 	{
@@ -45,7 +48,7 @@ public:
 		{
 			for (auto& p : m_list)
 			{
-				if (value_compare(child, p))
+				if (m_comp(child, p))
 				{
 					m_list.InsertBefore(child, p);
 					return;
@@ -55,15 +58,61 @@ public:
 		m_list.PushBack(child);
 	}
 
-	void Erase(reference child)
-	{
-		m_list.Erase(child);
-	}
+	void Erase(reference child) { m_list.Erase(child); }
+
+	void Clear() { m_list.Clear(); }
 
 	const container& Values() const { return m_list; }
 
 protected:
 	container m_list;
+	value_compare m_comp;
+};
+
+// Ordered list is based on intrusive list. It uses statble sort.
+template<typename _PtrTy, class _Compare, class _Equal>
+class UniqueOrderedList
+{
+public:
+	using value_type    = typename std::pointer_traits<_PtrTy>::pointer;
+	using pointer       = value_type*;
+	using reference     = value_type&;
+	using value_compare = _Compare;
+	using value_equal   = _Equal;
+	using container     = IntrusiveList<_PtrTy>;
+
+	UniqueOrderedList() {}
+	~UniqueOrderedList() { Clear(); }
+
+	bool Insert(reference child)
+	{
+		if (!m_list.IsEmpty())
+		{
+			for (auto& p : m_list)
+			{
+				if (m_comp(child, p))
+				{
+					m_list.InsertBefore(child, p);
+					return true;
+				}
+				else if (m_equal(child, p))
+					return false;
+			}
+		}
+		m_list.PushBack(child);
+		return true;
+	}
+
+	void Erase(reference child) { m_list.Erase(child); }
+
+	void Clear() { m_list.Clear(); }
+
+	const container& Values() const { return m_list; }
+
+protected:
+	container m_list;
+	value_compare m_comp;
+	value_equal   m_equal;
 };
 
 #endif

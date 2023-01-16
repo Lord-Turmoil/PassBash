@@ -50,6 +50,36 @@ XMLFile::~XMLFile()
 
 
 /******************************************************************************
+ * XMLFile::Parse -- Parse XML file from a string.                            *
+ *                                                                            *
+ *    Just the literal meaning.                                               *
+ *                                                                            *
+ * INPUT:   xml -- xml file buffer.                                           *
+ *                                                                            *
+ * OUTPUT:  Return whether succeeded or not.                                  *
+ *                                                                            *
+ * WARNINGS:  No valid filename for this method.                              *
+ *                                                                            *
+ * HISTORY:                                                                   *
+ *   2022/01/16 Tony : Created.                                               *
+ *============================================================================*/
+bool XMLFile::Parse(const char* xml)
+{
+	int ret;
+
+	if (m_isLoaded)
+		UnLoad();
+
+	ret = m_doc.Parse(xml);
+	if (ret != tinyxml2::XML_SUCCESS)
+		return false;
+
+	m_isLoaded = true;
+
+	return true;
+}
+
+/******************************************************************************
  * XMLFile::Load -- Load XML file from memory.                                *
  *                                                                            *
  *    Just the literal meaning.                                               *
@@ -90,7 +120,7 @@ bool XMLFile::Save(const char* filename)
 	if (!m_isLoaded)
 		return false;
 
-	int ret = m_doc.SaveFile(filename);
+	int ret = m_doc.SaveFile(filename, false);
 	if (ret != tinyxml2::XML_SUCCESS)
 		return false;
 

@@ -41,6 +41,7 @@ extern char buffer[INPUT_BUFFER_SIZE];
 **+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 */
 bool GetString(char* buffer);
+bool GetString(char* buffer, int minLen, int maxLen);
 
 
 template<typename _Ty>

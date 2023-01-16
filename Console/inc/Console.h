@@ -20,8 +20,8 @@
  *   Visual Studio 2022 Community                                             *
  ******************************************************************************/
 
-#ifndef _CNSL_CONSOLE_H_
-#define _CNSL_CONSOLE_H_
+#ifndef _CONSOLE_H_
+#define _CONSOLE_H_
 
 #include "Macros.h"
 

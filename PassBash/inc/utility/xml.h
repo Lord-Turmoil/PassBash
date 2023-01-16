@@ -42,6 +42,11 @@ public:
 	~XMLFile();
 
 	/*
+	** Parse xml file from string buffer. In this case, it won't have
+	** a valid filename!
+	*/
+	bool Parse(const char* xml);
+	/*
 	** Load the file from memory. This will close the previous file.
 	*/
 	bool Load(const char* filename);

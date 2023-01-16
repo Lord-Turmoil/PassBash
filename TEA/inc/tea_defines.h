@@ -1,40 +1,39 @@
 /******************************************************************************
  ***                        T O N Y ' S  S T U D I O                        ***
  ******************************************************************************
- *                   Project Name : PassBash                                  *
+ *                   Project Name : TEA                                       *
  *                                                                            *
- *                      File Name : Test.h                                    *
+ *                      File Name : tea_defines.h                             *
  *                                                                            *
  *                     Programmer : Tony Skywalker                            *
  *                                                                            *
- *                     Start Date : January 15, 2023                          *
+ *                     Start Date : January 16, 2023                          *
  *                                                                            *
  *                    Last Update :                                           *
  *                                                                            *
  * -------------------------------------------------------------------------- *
  * Over View:                                                                 *
- *   For test info.                                                           *
+ *   Basic defines.                                                           *
  * -------------------------------------------------------------------------- *
  * Build Environment:                                                         *
  *   Windows 11 Pro                                                           *
  *   Visual Studio 2022 Community Preview                                     *
  ******************************************************************************/
 
-#ifndef _TEST_H_
-#define _TEST_H_
+#ifndef _TEA_DEFINES_H_
+#define _TEA_DEFINES_H_
 
-#include "Macros.h"
+#define _TEA_BEGIN	namespace tea {
+#define _TEA_END	}
+#define _TEA		::tea::
 
-#ifdef PASH_TEST
+_TEA_BEGIN
 
-// Ahh... #define can not nest #define
-#define TEST(PROJ) PASH_TEST_##PROJ
+typedef unsigned long DATA;
 
-#define PASH_TEST_ORDERED_LIST 0	// Passed
-#define PASH_TEST_TEA          0	// Passed
-#define PASH_TEST_LOGGER       0	// Passed
-#define PASH_TEST_PASSDOC      1
+const size_t NCHAR = 2 * sizeof(long);	//  64 bit =  8 Byte =  8 char
+const size_t KCHAR = 2 * NCHAR;		// 128 bit = 16 Byte = 16 char
 
-#endif
+_TEA_END
 
 #endif

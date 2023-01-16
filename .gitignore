@@ -33,6 +33,7 @@
 
 # Directories
 Build/
+Work/
 int/
 lib/
 .vs/

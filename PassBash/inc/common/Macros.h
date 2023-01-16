@@ -28,6 +28,9 @@
 	class CLASS;             \
 	typedef CLASS* CLASS##Ptr;
 
+
+#define BIT(X) (1 << (X))
+
 /*
 **+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 ** Debug related.

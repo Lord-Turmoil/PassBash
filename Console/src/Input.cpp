@@ -43,15 +43,21 @@ static bool IsTerminator(char ch)
 
 bool GetString(char* buffer)
 {
+	return GetString(buffer, 1, INPUT_BUFFER_SIZE - 1);
+}
+
+bool GetString(char* buffer, int minLen, int maxLen)
+{
 	int length = 0;
 	char ch;
 
+	minLen = max(minLen, 1);
 	for (; ;)
 	{
 		ch = _getch();
 		if (IsTerminator(ch))
 		{
-			if (length > 0)
+			if (length > minLen)
 				break;
 		}
 		else if (ch == BACKSPACE)
@@ -62,7 +68,7 @@ bool GetString(char* buffer)
 				length--;
 			}
 		}
-		else
+		else if (length < maxLen)
 		{
 			buffer[length++] = ch;
 			InsertChar(ch);

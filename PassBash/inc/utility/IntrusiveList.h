@@ -63,15 +63,15 @@ public:
 	using pointer    = value_type*;
 	using reference  = value_type&;
 
-	IntrusiveList() : m_first(), m_last() {}
+	IntrusiveList() : m_first(nullptr), m_last(nullptr) {}
 
 	~IntrusiveList() { Clear(); }
 
+	value_type&       GetFirst()       { m_first; }
 	const value_type& GetFirst() const { return m_first; }
-	value_type& GetFirst() { m_first; }
 
+	value_type&       GetLast()       { return m_last; }
 	const value_type& GetLast() const { return m_last; }
-	value_type& GetLast() { return m_last; }
 
 	bool IsEmpty() const { return m_first == nullptr; }
 
@@ -343,6 +343,7 @@ private:
 template <typename _PtrTy>
 class IntrusiveListValue
 {
+	friend class IntrusiveList<_PtrTy>;
 public:
 	using value_type = _PtrTy;
 	using reference  = value_type&;
@@ -367,8 +368,6 @@ public:
 private:
 	value_type m_prev;
 	value_type m_next;
-
-	friend class IntrusiveList<_PtrTy>;
 };
 
 #endif

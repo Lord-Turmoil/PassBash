@@ -1,40 +1,47 @@
 /******************************************************************************
  ***                        T O N Y ' S  S T U D I O                        ***
  ******************************************************************************
- *                   Project Name : PassBash                                  *
+ *                   Project Name : TEA                                       *
  *                                                                            *
- *                      File Name : Test.h                                    *
+ *                      File Name : tea_core.h                                *
  *                                                                            *
  *                     Programmer : Tony Skywalker                            *
  *                                                                            *
- *                     Start Date : January 15, 2023                          *
+ *                     Start Date : January 16, 2023                          *
  *                                                                            *
  *                    Last Update :                                           *
  *                                                                            *
  * -------------------------------------------------------------------------- *
  * Over View:                                                                 *
- *   For test info.                                                           *
+ *   Core algorithm for TEA algorithm.                                        *
  * -------------------------------------------------------------------------- *
  * Build Environment:                                                         *
  *   Windows 11 Pro                                                           *
  *   Visual Studio 2022 Community Preview                                     *
  ******************************************************************************/
 
-#ifndef _TEST_H_
-#define _TEST_H_
+#ifndef _TEA_CORE_H_
+#define _TEA_CORE_H_
 
-#include "Macros.h"
+#include "tea_defines.h"
 
-#ifdef PASH_TEST
+_TEA_BEGIN
 
-// Ahh... #define can not nest #define
-#define TEST(PROJ) PASH_TEST_##PROJ
+// core algorithm
+// v[2]: 8 characters to be encrypted =  8 Byte
+// w[2]: save encrypted 8 characters  =  8 Byte
+// k[4]: the key                      = 16 Byte
+// it only encrypt/decrypt part of the data
+void encipher(const DATA* const v, DATA* const w, const DATA* const k);
+void decipher(const DATA* const v, DATA* const w, const DATA* const k);
 
-#define PASH_TEST_ORDERED_LIST 0	// Passed
-#define PASH_TEST_TEA          0	// Passed
-#define PASH_TEST_LOGGER       0	// Passed
-#define PASH_TEST_PASSDOC      1
+// easy way to use
+class TEAReader;
+class TEAWriter;
+// key must not be longer than 16!
+void encode(TEAReader* input, TEAWriter* output, const char* key);
+void decode(TEAReader* input, TEAWriter* output, const char* key);
 
-#endif
+_TEA_END
 
 #endif

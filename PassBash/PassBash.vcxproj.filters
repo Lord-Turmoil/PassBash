@@ -37,6 +37,9 @@
     <Filter Include="Source Files\test">
       <UniqueIdentifier>{416b80a7-a580-476c-a8d7-e6a93440ada0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\common">
+      <UniqueIdentifier>{7be4c390-f4cc-4e31-ba81-3e089ba65d38}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="inc\utility\tinyxml.h">
@@ -48,7 +51,7 @@
     <ClInclude Include="inc\utility\Auxilliary.h">
       <Filter>Header Files\utility</Filter>
     </ClInclude>
-    <ClInclude Include="inc\core\Node.h">
+    <ClInclude Include="inc\core\Document.h">
       <Filter>Header Files\core</Filter>
     </ClInclude>
     <ClInclude Include="inc\core\Entry.h">
@@ -69,6 +72,18 @@
     <ClInclude Include="inc\common\Test.h">
       <Filter>Header Files\common</Filter>
     </ClInclude>
+    <ClInclude Include="inc\common\Logger.h">
+      <Filter>Header Files\common</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\cmd\Command.h">
+      <Filter>Header Files\cmd</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\core\Global.h">
+      <Filter>Header Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\cmd\Scheduler.h">
+      <Filter>Header Files\cmd</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\utility\xml.cpp">
@@ -76,6 +91,36 @@
     </ClCompile>
     <ClCompile Include="src\test\OrderedListTest.cpp">
       <Filter>Source Files\test</Filter>
+    </ClCompile>
+    <ClCompile Include="src\test\TEATest.cpp">
+      <Filter>Source Files\test</Filter>
+    </ClCompile>
+    <ClCompile Include="src\core\Document.cpp">
+      <Filter>Source Files\core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\common\Logger.cpp">
+      <Filter>Source Files\common</Filter>
+    </ClCompile>
+    <ClCompile Include="src\test\LoggerTest.cpp">
+      <Filter>Source Files\test</Filter>
+    </ClCompile>
+    <ClCompile Include="src\test\PassDocTest.cpp">
+      <Filter>Source Files\test</Filter>
+    </ClCompile>
+    <ClCompile Include="src\cmd\StartCommand.cpp">
+      <Filter>Source Files\cmd</Filter>
+    </ClCompile>
+    <ClCompile Include="src\cmd\HostCommand.cpp">
+      <Filter>Source Files\cmd</Filter>
+    </ClCompile>
+    <ClCompile Include="src\cmd\SetPasswordCommand.cpp">
+      <Filter>Source Files\cmd</Filter>
+    </ClCompile>
+    <ClCompile Include="src\core\Global.cpp">
+      <Filter>Source Files\core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\cmd\Scheduler.cpp">
+      <Filter>Source Files\cmd</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

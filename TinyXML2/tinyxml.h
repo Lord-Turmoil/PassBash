@@ -33,6 +33,7 @@
 // There's a conflict with XMLDocument in msxml.h. :(
 using XMLDoc = tinyxml2::XMLDocument;
 using tinyxml2::XMLElement;
+using tinyxml2::XMLPrinter;
 
 #if defined(DEBUG) || defined(_DEBUG)
 #pragma comment(lib, "tinyxml2_b.lib")
