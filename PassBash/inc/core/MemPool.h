@@ -41,8 +41,18 @@ public:
 
 	~MemPool()
 	{
+		Destroy();
+	}
+
+	// Free all memory.
+	void Destroy()
+	{
+		while (!m_unused.empty())
+			m_unused.pop();
 		for (auto pool : m_pool)
 			_FreeBlock(pool);
+		m_pool.clear();
+		m_pBlock = m_pItem = nullptr;
 	}
 
 	pointer Alloc()

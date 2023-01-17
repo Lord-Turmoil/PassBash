@@ -23,6 +23,8 @@
 #ifndef _DOCUMENT_H_
 #define _DOCUMENT_H_
 
+#if 0
+
 #include "../common/Macros.h"
 #include "../utility/OrderedList.h"
 #include "../utility/xml.h"
@@ -148,11 +150,14 @@ private:
 class PassDoc
 {
 public:
-	PassDoc() : m_root(nullptr), m_current(nullptr), m_isOperational(false) {}
-	~PassDoc() {}
+	PassDoc() : m_root(nullptr), m_current(nullptr) {}
+	~PassDoc();
+
+	// Reset to initial state. Nothing loaded. Won't save current content.
+	void Reset();
 
 	// Load from encrypted file, then decode it.
-	bool Load(const std::string& filename, const std::string& password);
+	bool Load(const std::string& password);
 	bool Save(const std::string& password);
 	bool Save();	// only for debug purpose.
 
@@ -168,11 +173,8 @@ public:
 	const NodePtr Current() const { return m_current; }
 	NodePtr SetCurrent(NodePtr current);
 
-public:
-	bool IsOperational() const { return m_isOperational; }
-	void IsOperational(bool isOperational);
-
 private:
+	bool _GenerateData();	// If initial data is lost.
 	bool _Build();
 	NodePtr _Build(XMLElement* root);
 
@@ -182,10 +184,10 @@ private:
 	NodePtr m_root;
 	NodePtr m_current;
 
-	bool m_isOperational;
-
 	MemPool<Node> m_nodePool;
 	MemPool<Entry> m_entryPool;
 };
+
+#endif
 
 #endif

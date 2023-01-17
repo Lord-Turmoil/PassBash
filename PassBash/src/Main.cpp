@@ -1,47 +1,34 @@
 /******************************************************************************
  ***                        T O N Y ' S  S T U D I O                        ***
  ******************************************************************************
- *                   Project Name : Console                                   *
+ *                   Project Name : PassBash                                  *
  *                                                                            *
- *                      File Name : Common.h                                  *
+ *                      File Name : Main.cpp                                  *
  *                                                                            *
  *                     Programmer : Tony Skywalker                            *
  *                                                                            *
- *                     Start Date : January 1, 2023                           *
+ *                     Start Date : January 17, 2023                          *
  *                                                                            *
  *                    Last Update :                                           *
  *                                                                            *
  * -------------------------------------------------------------------------- *
  * Over View:                                                                 *
- *   Some defines?                                                            *
+ *   The entrance.                                                            *
  * -------------------------------------------------------------------------- *
  * Build Environment:                                                         *
  *   Windows 11 Pro                                                           *
  *   Visual Studio 2022 Community Preview                                     *
  ******************************************************************************/
 
-#ifndef _CNSL_COMMON_H_
-#define _CNSL_COMMON_H_
+#include "../inc/common/Macros.h"
 
-#include "Macros.h"
+#ifndef PASH_TEST
 
-_CNSL_BEGIN
+#include "../inc/cmd/Command.h"
+#include "../inc/cmd/CommandFactory.h"
+int main()
+{
 
-const char LINE_FEED	= '\n';
-const char CHARRIGE		= '\r';
-const char BACKSPACE	= '\b';
-const char SPACE		= ' ';
-const char ESCAPE       = 27;
-
-const char SPECIAL_LEADING     = 224;
-const char SPECIAL_ARROW_UP    = 72;
-const char SPECIAL_ARROW_DOWN  = 80;
-const char SPECIAL_ARROW_LEFT  = 75;
-const char SPECIAL_ARROW_RIGHT = 77;
-const char SPECIAL_DELETE      = 83;
-const char SPECIAL_HOME        = 71;
-const char SPECIAL_END         = 79;
-
-_CNSL_END
+}
 
 #endif

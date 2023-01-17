@@ -140,14 +140,18 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="inc\cmd\Command.h" />
+    <ClInclude Include="inc\cmd\CommandFactory.h" />
+    <ClInclude Include="inc\cmd\CommandHeader.h" />
     <ClInclude Include="inc\cmd\Scheduler.h" />
     <ClInclude Include="inc\common\Logger.h" />
     <ClInclude Include="inc\common\Macros.h" />
     <ClInclude Include="inc\common\Test.h" />
+    <ClInclude Include="inc\core\Config.h" />
     <ClInclude Include="inc\core\Entry.h" />
     <ClInclude Include="inc\core\Global.h" />
     <ClInclude Include="inc\core\MemPool.h" />
     <ClInclude Include="inc\core\Document.h" />
+    <ClInclude Include="inc\core\PassDoc.h" />
     <ClInclude Include="inc\utility\Auxilliary.h" />
     <ClInclude Include="inc\utility\IntrusiveList.h" />
     <ClInclude Include="inc\utility\OrderedList.h" />
@@ -155,14 +159,25 @@
     <ClInclude Include="inc\utility\xml.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\cmd\Command.cpp" />
+    <ClCompile Include="src\cmd\CommandFactory.cpp" />
+    <ClCompile Include="src\cmd\EditCommand.cpp" />
     <ClCompile Include="src\cmd\HostCommand.cpp" />
+    <ClCompile Include="src\cmd\LoginCommand.cpp" />
+    <ClCompile Include="src\cmd\RegisterCommand.cpp" />
     <ClCompile Include="src\cmd\Scheduler.cpp" />
     <ClCompile Include="src\cmd\SetPasswordCommand.cpp" />
     <ClCompile Include="src\cmd\StartCommand.cpp" />
+    <ClCompile Include="src\cmd\TreeCommand.cpp" />
     <ClCompile Include="src\common\Logger.cpp" />
+    <ClCompile Include="src\core\Config.cpp" />
     <ClCompile Include="src\core\Document.cpp" />
     <ClCompile Include="src\core\Global.cpp" />
+    <ClCompile Include="src\core\PassDoc.cpp" />
+    <ClCompile Include="src\Main.cpp" />
+    <ClCompile Include="src\test\ConfigTest.cpp" />
     <ClCompile Include="src\test\LoggerTest.cpp" />
+    <ClCompile Include="src\test\MainTest.cpp" />
     <ClCompile Include="src\test\OrderedListTest.cpp" />
     <ClCompile Include="src\test\PassDocTest.cpp" />
     <ClCompile Include="src\test\TEATest.cpp" />

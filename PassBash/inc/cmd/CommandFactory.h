@@ -1,47 +1,40 @@
 /******************************************************************************
  ***                        T O N Y ' S  S T U D I O                        ***
  ******************************************************************************
- *                   Project Name : Console                                   *
+ *                   Project Name : PassBash                                  *
  *                                                                            *
- *                      File Name : Common.h                                  *
+ *                      File Name : CommandFactory.h                          *
  *                                                                            *
  *                     Programmer : Tony Skywalker                            *
  *                                                                            *
- *                     Start Date : January 1, 2023                           *
+ *                     Start Date : January 17, 2023                          *
  *                                                                            *
  *                    Last Update :                                           *
  *                                                                            *
  * -------------------------------------------------------------------------- *
  * Over View:                                                                 *
- *   Some defines?                                                            *
+ *   Well, Simple factory pattern.                                            *
  * -------------------------------------------------------------------------- *
  * Build Environment:                                                         *
  *   Windows 11 Pro                                                           *
  *   Visual Studio 2022 Community Preview                                     *
  ******************************************************************************/
 
-#ifndef _CNSL_COMMON_H_
-#define _CNSL_COMMON_H_
+#ifndef _COMMAND_FACTORY_H_
+#define _COMMAND_FACTORY_H_
 
-#include "Macros.h"
+#include "../../inc/common/Macros.h"
 
-_CNSL_BEGIN
+DECLARE_SMART_CLASS(Command)
 
-const char LINE_FEED	= '\n';
-const char CHARRIGE		= '\r';
-const char BACKSPACE	= '\b';
-const char SPACE		= ' ';
-const char ESCAPE       = 27;
+class CommandFactory
+{
+public:
+	// This is for basic command line operations.
+	static CommandPtr Spawn(const char* cmd);
 
-const char SPECIAL_LEADING     = 224;
-const char SPECIAL_ARROW_UP    = 72;
-const char SPECIAL_ARROW_DOWN  = 80;
-const char SPECIAL_ARROW_LEFT  = 75;
-const char SPECIAL_ARROW_RIGHT = 77;
-const char SPECIAL_DELETE      = 83;
-const char SPECIAL_HOME        = 71;
-const char SPECIAL_END         = 79;
-
-_CNSL_END
+	// This is for advanced commands which act as interface.
+	static CommandPtr SpawnSpecial(const char* cmd);
+};
 
 #endif

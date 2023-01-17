@@ -23,7 +23,7 @@
 #ifndef _GLOBAL_H_
 #define _GLOBAL_H_
 
-#include "Document.h"
+#include "PassDoc.h"
 
 #include <string>
 
@@ -33,10 +33,23 @@
 ** want to bother to wrap them, and Read Alert and CNC did so, too.
 */
 
+extern const std::string g_default;
 extern std::string g_password;
+
 extern std::string g_pwd;
 
 extern PassDoc g_passDoc;
 
+extern const char g_TITLE[];
+extern const char g_COPYRIGHT[];
+extern const char g_AUTHOR[];
+
+extern const char g_DATA_FILE[];
+extern const char g_CONFIG_FILE[];
+
+extern const char g_DEFAULT_DATA[];
+
+class Config;
+extern Config g_config;
 
 #endif

@@ -33,7 +33,10 @@
 #define PASH_TEST_ORDERED_LIST 0	// Passed
 #define PASH_TEST_TEA          0	// Passed
 #define PASH_TEST_LOGGER       0	// Passed
-#define PASH_TEST_PASSDOC      1
+#define PASH_TEST_PASSDOC      0	// Passed
+#define PASH_TEST_CONFIG       0	// Passed
+
+#define PASH_TEST_MAIN         1
 
 #endif
 

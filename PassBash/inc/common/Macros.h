@@ -23,10 +23,15 @@
 #ifndef _MACROS_H_
 #define _MACROS_H_
 
+#include <memory>
 
 #define DECLARE_CLASS(CLASS) \
 	class CLASS;             \
 	typedef CLASS* CLASS##Ptr;
+
+#define DECLARE_SMART_CLASS(CLASS) \
+	class CLASS;                   \
+	typedef std::shared_ptr<CLASS> CLASS##Ptr;
 
 
 #define BIT(X) (1 << (X))

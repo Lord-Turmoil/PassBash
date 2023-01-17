@@ -24,7 +24,9 @@
 
 #if TEST(PASSDOC)
 
-#include "../../inc/core/Document.h"
+#include "../../inc/core/PassDoc.h"
+#include "../../inc/core/Global.h"
+
 
 const char PASSWORD[] = "Passworld";
 const char DATA_FILE[] = "data";
@@ -33,7 +35,7 @@ int main()
 {
 	PassDoc doc;
 
-	doc.Load(DATA_FILE, PASSWORD);
+	doc.Load(g_default.c_str());
 	doc.Save();
 
 	return 0;

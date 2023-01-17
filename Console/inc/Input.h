@@ -40,8 +40,11 @@ extern char buffer[INPUT_BUFFER_SIZE];
 ** Input Control
 **+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 */
-bool GetString(char* buffer);
-bool GetString(char* buffer, int minLen, int maxLen);
+void GetString(char* buffer);
+void GetString(char* buffer, int minLen, int maxLen);
+// This can be interrupted by ESC or empty input.
+int GetStringInterruptable(char* buffer, bool enable = true);
+int GetStringInterruptable(char* buffer, int minLen, int maxLen, bool enable = true);
 
 
 template<typename _Ty>

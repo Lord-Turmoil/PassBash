@@ -20,7 +20,10 @@
  *   Visual Studio 2022 Community Preview                                     *
  ******************************************************************************/
 
+#if 0
+
 #include "../../inc/core/Document.h"
+#include "../../inc/core/Global.h"
 #include "../../inc/common/Logger.h"
 #include "../../inc/utility/Auxilliary.h"
 
@@ -225,16 +228,38 @@ void Node::_InitXMLElement()
 ** PassDoc
 **+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 */
-bool PassDoc::Load(const std::string& filename, const std::string& password)
+PassDoc::~PassDoc()
+{
+	Save(g_password);
+}
+
+void PassDoc::Reset()
+{
+	m_filename = "";
+	m_file.UnLoad();
+
+	m_nodePool.Destroy();
+	m_entryPool.Destroy();
+}
+
+bool PassDoc::Load(const std::string& password)
 {
 	FILE* input;
-	if (fopen_s(&input, filename.c_str(), "rb") != 0)
+	if (fopen_s(&input, g_DATA_FILE, "rb") != 0)
 	{
-		LOG_ERROR("Missing file \"%s\"", filename.c_str());
-		return false;
+		if (!_GenerateData())
+		{
+			LOG_ERROR("Essential data crashed!");
+			return false;
+		}
+		else if (fopen_s(&input, g_DATA_FILE, "rb") != 0)
+		{
+			LOG_ERROR("Missing file \"%s\"", g_DATA_FILE);
+			return false;
+		}
 	}
 
-	m_filename = filename;
+	m_filename = g_DATA_FILE;
 
 	fseek(input, 0, SEEK_END);
 	char* xml = new char[ftell(input) / 2 + 128];
@@ -338,14 +363,22 @@ NodePtr PassDoc::SetCurrent(NodePtr current)
 	return prev;
 }
 
-void PassDoc::IsOperational(bool isOperational)
+bool PassDoc::_GenerateData()
 {
-	m_isOperational = isOperational;
+	FILE* output;
+	if (fopen_s(&output, g_DATA_FILE, "wb") != 0)
+	{
+		LOG_ERROR("Cannot open file \"%s\"", g_DATA_FILE);
+		return false;
+	}
 
-	if (m_isOperational)
-		m_root->m_elem->SetAttribute("ready", "true");
-	else
-		m_root->m_elem->SetAttribute("ready", "false");
+	tea::TEABufferReader* reader = new tea::TEABufferReader(g_DEFAULT_DATA);
+	tea::TEAFileWriter* writer = new tea::TEAFileWriter(output);
+	tea::encode(reader, writer, g_default.c_str());
+	delete reader;
+	delete writer;
+
+	return true;
 }
 
 bool PassDoc::_Build()
@@ -357,8 +390,6 @@ bool PassDoc::_Build()
 	m_root->_SetName(".");
 	m_root->_SetType(NodeType::GROUP);
 	m_root->_SetXMLElement(elem);
-
-	m_isOperational = elem->BoolAttribute("ready");
 
 	XMLElement* tag = elem->FirstChildElement();
 	while (tag)
@@ -417,3 +448,5 @@ NodePtr PassDoc::_Build(XMLElement* root)
 
 	return node;
 }
+
+#endif

@@ -34,6 +34,7 @@
 # Directories
 Build/
 Work/
+Publish/
 int/
 lib/
 .vs/

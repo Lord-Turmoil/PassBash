@@ -1,47 +1,47 @@
 /******************************************************************************
  ***                        T O N Y ' S  S T U D I O                        ***
  ******************************************************************************
- *                   Project Name : Console                                   *
+ *                   Project Name : PassBash                                  *
  *                                                                            *
- *                      File Name : Common.h                                  *
+ *                      File Name : CommandHeader.h                           *
  *                                                                            *
  *                     Programmer : Tony Skywalker                            *
  *                                                                            *
- *                     Start Date : January 1, 2023                           *
+ *                     Start Date : January 17, 2023                          *
  *                                                                            *
  *                    Last Update :                                           *
  *                                                                            *
  * -------------------------------------------------------------------------- *
  * Over View:                                                                 *
- *   Some defines?                                                            *
+ *   Include all headers for all command related cpp.                         *
  * -------------------------------------------------------------------------- *
  * Build Environment:                                                         *
  *   Windows 11 Pro                                                           *
  *   Visual Studio 2022 Community Preview                                     *
  ******************************************************************************/
 
-#ifndef _CNSL_COMMON_H_
-#define _CNSL_COMMON_H_
+#ifndef _COMMAND_HEADER_H_
+#define _COMMAND_HEADER_H_
 
-#include "Macros.h"
+#include "../../inc/cmd/Command.h"
+#include "../../inc/cmd/CommandFactory.h"
+#include "../../inc/cmd/Scheduler.h"
+#include "../../inc/core/Global.h"
+#include "../../inc/core/Config.h"
+#include "../../inc/utility/xml.h"
 
-_CNSL_BEGIN
+#include <cnsl.h>
 
-const char LINE_FEED	= '\n';
-const char CHARRIGE		= '\r';
-const char BACKSPACE	= '\b';
-const char SPACE		= ' ';
-const char ESCAPE       = 27;
+// Some colors.
+#define PROMPT_COLOR   FOREGROUND_LIGHT(FOREGROUND_BLUE)
+#define GREETING_COLOR FOREGROUND_GREEN
+#define ERROR_COLOR    FOREGROUND_RED
+#define MESSAGE_COLOR  FOREGROUND_YELLOW
+#define GROUP_COLOR    FOREGROUND_CYAN
+#define PWD_COLOR      FOREGROUND_MAGENTA
+#define ITEM_COLOR     FOREGROUND_LIGHT(FOREGROUND_MAGENTA)
 
-const char SPECIAL_LEADING     = 224;
-const char SPECIAL_ARROW_UP    = 72;
-const char SPECIAL_ARROW_DOWN  = 80;
-const char SPECIAL_ARROW_LEFT  = 75;
-const char SPECIAL_ARROW_RIGHT = 77;
-const char SPECIAL_DELETE      = 83;
-const char SPECIAL_HOME        = 71;
-const char SPECIAL_END         = 79;
-
-_CNSL_END
+// Some errors.
+#define ARGUMENTS_ILLEGAL "Arguments illegal!"
 
 #endif

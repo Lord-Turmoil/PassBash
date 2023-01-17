@@ -26,6 +26,7 @@
 #include "Macros.h"
 
 #include <string>
+#include <Windows.h>
 
 _CNSL_BEGIN
 
@@ -40,11 +41,21 @@ void InsertCarrige();		// Row does not change, col back to zero.
 void InsertNewLine();		// Row++, col back to zero.
 void InsertNewLine(int n);	// Insert n new lines.
 
-void InsertBackspace();	// Clear the last character and went back by one.
+void InsertReverseLineFeed();
+void InsertReverseLineFeed(int n);
+void InsertReverseNewLine();
+void InsertReverseNewLine(int n);
+
+void InsertBackspace();
 void InsertBackspace(int n);
+
+void InsertDelete();	// Clear the last character and went back by one.
+void InsertDelete(int n);
 
 void InsertChar(const char ch);
 void InsertText(const char* format, ...);
+void InsertText(WORD foreground, const char* format, ...);
+
 void InsertSplitLine(char split);
 void InsertHeaderLine(const char* header, char split = '-');
 

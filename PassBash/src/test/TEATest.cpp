@@ -30,11 +30,11 @@
 
 #pragma warning(disable: 4996)
 
-const char ORIGINAL_FILE[] = "data.xml";
-const char ENCODE_FILE[]   = "encode";
-const char DECODE_FILE[]   = "decode.xml";
+char ORIGINAL_FILE[32];
+char ENCODE_FILE[32];
+char DECODE_FILE[32];
 
-const char PASSWORD[] = "Passworld";
+const char PASSWORD[24] = "Passworld";
 
 bool encode();
 bool decode();
@@ -45,9 +45,16 @@ int main()
 	cnsl::SetTitle("TEA Utility");
 	cnsl::Print();
 
+	cnsl::InsertText("Original file: ");
+	cnsl::GetString(ORIGINAL_FILE, 1, 30);
+	cnsl::InsertText("\n  Encode file: ");
+	cnsl::GetString(ENCODE_FILE, 1, 30);
+	cnsl::InsertText("\n  Decode file: ");
+	cnsl::GetString(DECODE_FILE, 1, 30);
+	cnsl::InsertNewLine();
 	encode();
 	decode();
-	bufferDecode();
+	// bufferDecode();
 
 	return 0;
 }

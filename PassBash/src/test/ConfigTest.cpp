@@ -1,47 +1,45 @@
 /******************************************************************************
  ***                        T O N Y ' S  S T U D I O                        ***
  ******************************************************************************
- *                   Project Name : Console                                   *
+ *                   Project Name : PassBash                                  *
  *                                                                            *
- *                      File Name : Common.h                                  *
+ *                      File Name : ConfigTest.cpp                            *
  *                                                                            *
  *                     Programmer : Tony Skywalker                            *
  *                                                                            *
- *                     Start Date : January 1, 2023                           *
+ *                     Start Date : January 17, 2023                          *
  *                                                                            *
  *                    Last Update :                                           *
  *                                                                            *
  * -------------------------------------------------------------------------- *
  * Over View:                                                                 *
- *   Some defines?                                                            *
+ *   Config test.                                                             *
  * -------------------------------------------------------------------------- *
  * Build Environment:                                                         *
  *   Windows 11 Pro                                                           *
  *   Visual Studio 2022 Community Preview                                     *
  ******************************************************************************/
 
-#ifndef _CNSL_COMMON_H_
-#define _CNSL_COMMON_H_
+#include "../../inc/common/Test.h"
 
-#include "Macros.h"
+#if TEST(CONFIG)
 
-_CNSL_BEGIN
+#include "../../inc/core/Config.h"
+#include "../../inc/core/Global.h"
+#include "../../inc/common/Logger.h"
 
-const char LINE_FEED	= '\n';
-const char CHARRIGE		= '\r';
-const char BACKSPACE	= '\b';
-const char SPACE		= ' ';
-const char ESCAPE       = 27;
+#include <cnsl.h>
 
-const char SPECIAL_LEADING     = 224;
-const char SPECIAL_ARROW_UP    = 72;
-const char SPECIAL_ARROW_DOWN  = 80;
-const char SPECIAL_ARROW_LEFT  = 75;
-const char SPECIAL_ARROW_RIGHT = 77;
-const char SPECIAL_DELETE      = 83;
-const char SPECIAL_HOME        = 71;
-const char SPECIAL_END         = 79;
+int main()
+{
+	cnsl::InitConsole(110);
+	cnsl::SetTitle("Config Test");
+	cnsl::Print();
 
-_CNSL_END
+	g_config.Load();
+	PRINT_ERROR();
+
+	return 0;
+}
 
 #endif

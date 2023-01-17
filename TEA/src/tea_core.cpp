@@ -27,7 +27,7 @@
 _TEA_BEGIN
 
 static const DATA TEA_DELTA = 0x9E3779B9;
-static const DATA TEA_SUM = 0xC6EF3720;
+static const DATA TEA_SUM   = 0xC6EF3720;
 
 void encipher(const DATA* const v, DATA* const w, const DATA* const k)
 {
@@ -83,10 +83,11 @@ void encode(TEAReader* input, TEAWriter* output, const char* key)
 void decode(TEAReader* input, TEAWriter* output, const char* key)
 {
 	DATA inptr[2];
-	char outbuf[NCHAR];
+	char outbuf[NCHAR + 1];
 	DATA* outptr = reinterpret_cast<DATA*>(outbuf);
 	const DATA* k = reinterpret_cast<const DATA*>(key);
 
+	outbuf[NCHAR] = '\0';
 	while (input->Read((char*)inptr, KCHAR))
 	{
 		decipher(inptr, outptr, k);

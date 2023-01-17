@@ -22,12 +22,12 @@
 
 #include "../../inc/cmd/Scheduler.h"
 
-void Sheduler::AddTask(CommandPtr cmd, ArgListPtr args)
+void Scheduler::AddTask(CommandPtr cmd, ArgListPtr args)
 {
 	m_queue.push(Task{ cmd, args });
 }
 
-void Sheduler::Run()
+void Scheduler::Run()
 {
 	while (!m_queue.empty())
 	{
@@ -45,10 +45,8 @@ void Sheduler::Run()
 	}
 }
 
-void Sheduler::_RecycleTask(Task& task)
+void Scheduler::_RecycleTask(Task& task)
 {
-	if (task.cmd)
-		delete task.cmd;
 	if (task.args)
 		delete task.args;
 }

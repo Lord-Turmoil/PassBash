@@ -367,6 +367,13 @@ void DefaultHeaderPrinter()
 {
 	char buffer[128];
 
+	TextAttribute attr;
+	TextAttribute old;
+
+	attr.foreground = FOREGROUND_WHITE;
+	attr.background = BACKGROUND_BLACK;
+	SetTextAttribute(attr, &old);
+
 	if (gConsoleInfo.title)
 		InsertHeaderLine(gConsoleInfo.title, '-');
 	if (gConsoleInfo.author)
@@ -383,6 +390,8 @@ void DefaultHeaderPrinter()
 	InsertSplitLine('_');
 
 	InsertNewLine();
+
+	SetTextAttribute(old, nullptr);
 }
 
 void Print()
@@ -398,6 +407,10 @@ void Reprint()
 		Clear();
 		if (gConsoleInfo.headerReprint && gConsoleInfo.headerPrinter)
 			gConsoleInfo.headerPrinter();
+	}
+	else
+	{
+		putchar('\n');
 	}
 }
 

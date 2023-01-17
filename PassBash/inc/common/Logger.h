@@ -40,20 +40,33 @@ class Logger
 {
 public:
 	static void LogError(const char* format, ...);
-	static void Clear();
-	static void PrintLogs();
+	static void ClearErrors();
+	static void PrintErrors();
+
+	static void LogMessage(const char* format, ...);
+	static void ClearMessages();
+	static void PrintMessages();
+
 	static bool Good();
 
 private:
 	static std::vector<std::string> m_logs;
+	static std::vector<std::string> m_msgs;
 	static char m_buffer[LOGGER_BUFFER_SIZE];
 };
 
 #define LOG_LOCATION R"(In "%s": )"
 
-#define LOG_ERROR(FORMAT, ...) Logger::LogError(FORMAT, __VA_ARGS__)
-#define LOG_CLEAR() Logger::Clear()
-#define PRINT_LOG() Logger::PrintLogs()
-#define HAS_ERROR() (!Logger::Good())
 
+#define LOG_ERROR(FORMAT, ...)   Logger::LogError(FORMAT, __VA_ARGS__)
+#define LOG_MESSAGE(FORMAT, ...) Logger::LogMessage(FORMAT, __VA_ARGS__)
+
+#define LOG_CLEAR_ERRORS()   Logger::ClearErrors()
+#define LOG_CLEAR_MESSAGES() Logger::ClearMessages()
+
+#define PRINT_ERROR()   Logger::PrintErrors()
+#define PRINT_MESSAGE() Logger::PrintMessages()
+
+#define HAS_ERROR() (!Logger::Good())
+#define STATUS()    (Logger::Good())
 #endif

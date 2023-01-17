@@ -20,6 +20,44 @@
  *   Visual Studio 2022 Community Preview                                     *
  ******************************************************************************/
 
-#include "../../inc/cmd/Command.h"
-#include "../../inc/core/Global.h"
+#include "../../inc/cmd/CommandHeader.h"
 
+
+void StartCommand::OnStart()
+{
+	_InitConsole();
+}
+
+bool StartCommand::Handle(const ArgListPtr args)
+{
+	_InitConfig();
+
+	// First use.
+	if (g_password == g_default)
+	{
+		Scheduler::GetInstance()
+			->AddTask(CommandFactory::SpawnSpecial("Register"), nullptr);
+	}
+	else
+	{
+		Scheduler::GetInstance()
+			->AddTask(CommandFactory::SpawnSpecial("Login"), nullptr);
+	}
+
+	return !HAS_ERROR();
+}
+
+void StartCommand::_InitConsole()
+{
+	cnsl::InitConsole(110);
+	cnsl::SetHeader(g_TITLE, g_COPYRIGHT, g_AUTHOR);
+	cnsl::SetTextForeground(FOREGROUND_WHITE);
+	cnsl::SetTextBackground(BACKGROUND_BLACK);
+	cnsl::Print();
+	cnsl::OverflowReprint(false);
+}
+
+void StartCommand::_InitConfig()
+{
+	g_config.Load();
+}

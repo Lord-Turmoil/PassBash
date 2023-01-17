@@ -28,4 +28,7 @@
 #define _STR_SAME(STR1, STR2) (strcmp(STR1, STR2) == 0)
 #define _STR_DIFF(STR1, STR2) (strcmp(STR1, STR2) != 0)
 
+#define _STR_NSAME(STR1, STR2) (strncmp(STR1, STR2, strlen(STR2)) == 0)
+#define _STR_NDIFF(STR1, STR2) (strncmp(STR1, STR2, strlen(STR2)) != 0)
+
 #endif

@@ -24,6 +24,7 @@
 #include "../inc/Common.h"
 
 #include <ctime>
+#include <cctype>
 
 _CNSL_BEGIN
 
@@ -41,43 +42,123 @@ static bool IsTerminator(char ch)
 	return false;
 }
 
-bool GetString(char* buffer)
+void GetString(char* buffer)
 {
-	return GetString(buffer, 1, INPUT_BUFFER_SIZE - 1);
+	GetString(buffer, 1, INPUT_BUFFER_SIZE - 1);
 }
 
-bool GetString(char* buffer, int minLen, int maxLen)
+void GetString(char* buffer, int minLen, int maxLen)
+{
+	minLen = max(minLen, 1);
+	GetStringInterruptable(buffer, minLen, maxLen, false);
+}
+
+int GetStringInterruptable(char* buffer, bool enable)
+{
+	return GetStringInterruptable(buffer, 1, INPUT_BUFFER_SIZE - 1, enable);
+}
+
+int GetStringInterruptable(char* buffer, int minLen, int maxLen, bool enable)
 {
 	int length = 0;
+	int pos = 0;
 	char ch;
 
-	minLen = max(minLen, 1);
 	for (; ;)
 	{
 		ch = _getch();
 		if (IsTerminator(ch))
 		{
-			if (length > minLen)
-				break;
+			if (length >= minLen)
+				return length;
+			else if (enable)
+				return -1;
+		}
+		else if ((ch == ESCAPE) && enable)
+		{
+			return -1;
+		}
+		else if (ch == SPECIAL_LEADING)
+		{
+			ch = _getch();
+			if (ch == SPECIAL_ARROW_LEFT)
+			{
+				if (pos > 0)
+				{
+					InsertBackspace();
+					pos--;
+				}
+			}
+			else if (ch == SPECIAL_ARROW_RIGHT)
+			{
+				if (pos < length)
+				{
+					InsertChar(buffer[pos]);
+					pos++;
+				}
+			}
+			else if (ch == SPECIAL_DELETE)
+			{
+				if (pos < length)
+				{
+					for (int i = pos + 1; i < length; i++)
+					{
+						buffer[i - 1] = buffer[i];
+						InsertChar(buffer[i]);
+					}
+					InsertChar(SPACE);
+					InsertBackspace(length - pos);
+					length--;
+					buffer[length] = '\0';
+				}
+			}
+			else if (ch == SPECIAL_HOME)
+			{
+				InsertBackspace(pos);
+				pos = 0;
+			}
+			else if (ch == SPECIAL_END)
+			{
+				for (int i = pos; i < length; i++)
+					InsertChar(buffer[i]);
+				pos = length;
+			}
 		}
 		else if (ch == BACKSPACE)
 		{
-			if (length > 0)
+			if (pos > 0)
 			{
-				InsertBackspace();
+				InsertDelete();
+				for (int i = pos; i < length; i++)
+				{
+					InsertChar(buffer[i]);
+					buffer[i - 1] = buffer[i];
+				}
+				InsertChar(SPACE);
+				InsertBackspace(length - pos + 1);
+				pos--;
 				length--;
+				buffer[length] = '\0';
 			}
 		}
 		else if (length < maxLen)
 		{
-			buffer[length++] = ch;
-			InsertChar(ch);
+			if (isprint(ch))
+			{
+				for (int i = length; i > pos; i--)
+					buffer[i] = buffer[i - 1];
+				buffer[pos] = ch;
+				length++;
+				buffer[length] = '\0';
+				for (int i = pos; i < length; i++)
+					InsertChar(buffer[i]);
+				pos++;
+				InsertBackspace(length - pos);
+			}
 		}
 	}
 
-	buffer[length] = '\0';
-
-	return true;
+	return length;
 }
 
 void FlushInput()

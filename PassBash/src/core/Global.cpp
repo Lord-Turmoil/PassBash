@@ -21,12 +21,28 @@
  ******************************************************************************/
 
 #include "../../inc/core/Global.h"
+#include "../../inc/core/Config.h"
 
-std::string g_password { "Passworld" };
-std::string g_pwd      { "." };
+const std::string g_default { "null" };
+std::string g_password { "null" };
+
+std::string g_pwd { "." };
 
 PassDoc g_passDoc{};
 
 const char g_TITLE[]     { "PassBash" };
 const char g_COPYRIGHT[] { "Tony's Studio 2020 - 2023" };
 const char g_AUTHOR[]    { "Tony Skywalker" };
+
+const char g_DATA_FILE[]   { "data" };
+const char g_CONFIG_FILE[] { "config" };
+
+Config g_config{};
+
+const char g_DEFAULT_DATA[]
+{
+R"(<?xml version="1.0" encoding="UTF-8"?>
+<Group name=".">
+</Group>
+)"
+};

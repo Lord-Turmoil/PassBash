@@ -29,6 +29,7 @@
 
 
 std::vector<std::string> Logger::m_logs;
+std::vector<std::string> Logger::m_msgs;
 char Logger::m_buffer[LOGGER_BUFFER_SIZE];
 
 static LoggerStatus status = LoggerStatus::GOOD;
@@ -44,27 +45,49 @@ void Logger::LogError(const char* format, ...)
 	status = LoggerStatus::BAD;
 }
 
-void Logger::Clear()
+void Logger::ClearErrors()
 {
 	status = LoggerStatus::GOOD;
 	m_logs.clear();
 }
 
-void Logger::PrintLogs()
+void Logger::PrintErrors()
 {
-	cnsl::TextAttribute newAttr;
-	cnsl::TextAttribute oldAttr;
-
-	newAttr.foreground = FOREGROUND_RED;
-	newAttr.background = 0;
-	cnsl::SetTextAttribute(newAttr, &oldAttr);
+	WORD old = cnsl::SetTextForeground(FOREGROUND_RED);
 	
 	cnsl::InsertHeaderLine("Error Log", '_');
 	for (auto it = m_logs.rbegin(); it != m_logs.rend(); it++)
 		cnsl::InsertText("\t%s\n", it->c_str());
 	cnsl::InsertSplitLine('_');
 	
-	cnsl::SetTextAttribute(oldAttr, nullptr);
+	cnsl::SetTextForeground(old);
+}
+
+void Logger::LogMessage(const char* format, ...)
+{
+	va_list args;
+	va_start(args, format);
+	vsprintf_s(m_buffer, format, args);
+	va_end(args);
+
+	m_msgs.push_back(m_buffer);
+}
+
+void Logger::ClearMessages()
+{
+	m_msgs.clear();
+}
+
+void Logger::PrintMessages()
+{
+	WORD old = cnsl::SetTextForeground(FOREGROUND_LIGHT(FOREGROUND_MAGENTA));
+
+	cnsl::InsertHeaderLine("Message Log", '_');
+	for (auto it = m_msgs.rbegin(); it != m_msgs.rend(); it++)
+		cnsl::InsertText("\t%s\n", it->c_str());
+	cnsl::InsertSplitLine('_');
+
+	cnsl::SetTextForeground(old);
 }
 
 bool Logger::Good()

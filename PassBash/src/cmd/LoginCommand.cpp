@@ -1,47 +1,66 @@
 /******************************************************************************
  ***                        T O N Y ' S  S T U D I O                        ***
  ******************************************************************************
- *                   Project Name : Console                                   *
+ *                   Project Name : PassBash                                  *
  *                                                                            *
- *                      File Name : Common.h                                  *
+ *                      File Name : LoginCommand.cpp                          *
  *                                                                            *
  *                     Programmer : Tony Skywalker                            *
  *                                                                            *
- *                     Start Date : January 1, 2023                           *
+ *                     Start Date : January 17, 2023                          *
  *                                                                            *
  *                    Last Update :                                           *
  *                                                                            *
  * -------------------------------------------------------------------------- *
  * Over View:                                                                 *
- *   Some defines?                                                            *
+ *   Simple login, just check for password.                                   *
  * -------------------------------------------------------------------------- *
  * Build Environment:                                                         *
  *   Windows 11 Pro                                                           *
  *   Visual Studio 2022 Community Preview                                     *
  ******************************************************************************/
 
-#ifndef _CNSL_COMMON_H_
-#define _CNSL_COMMON_H_
+#include "../../inc/cmd/CommandHeader.h"
 
-#include "Macros.h"
+void LoginCommand::OnStart()
+{
+	cnsl::InsertText(GREETING_COLOR, "Welcome back, my friend!\n");
+}
 
-_CNSL_BEGIN
+bool LoginCommand::Handle(const ArgListPtr args)
+{
+	_ReceivePassword();
+	cnsl::InsertNewLine();
+	cnsl::InsertText(GREETING_COLOR, "Credential confirmed!");
+	Sleep(500);
 
-const char LINE_FEED	= '\n';
-const char CHARRIGE		= '\r';
-const char BACKSPACE	= '\b';
-const char SPACE		= ' ';
-const char ESCAPE       = 27;
+	if (!HAS_ERROR())
+	{
+		Scheduler::GetInstance()
+			->AddTask(CommandFactory::SpawnSpecial("Host"), nullptr);
+	}
 
-const char SPECIAL_LEADING     = 224;
-const char SPECIAL_ARROW_UP    = 72;
-const char SPECIAL_ARROW_DOWN  = 80;
-const char SPECIAL_ARROW_LEFT  = 75;
-const char SPECIAL_ARROW_RIGHT = 77;
-const char SPECIAL_DELETE      = 83;
-const char SPECIAL_HOME        = 71;
-const char SPECIAL_END         = 79;
+	return STATUS();
+}
 
-_CNSL_END
+void LoginCommand::_ReceivePassword()
+{
+	char buffer[32];
 
-#endif
+	cnsl::InsertText(MESSAGE_COLOR, "Please enter your master password.\n");
+	cnsl::InsertText(PROMPT_COLOR, "$ ");
+	cnsl::GetString(buffer, 1, 31);
+	while (g_password != buffer)
+	{
+		cnsl::InsertNewLine();
+		cnsl::InsertText(ERROR_COLOR, "WRONG PASSWORD!");
+		Sleep(800);
+		cnsl::Clear(0);
+		cnsl::InsertReverseNewLine();
+		cnsl::Clear(0);
+		cnsl::InsertCarrige();
+
+		cnsl::InsertText(PROMPT_COLOR, "$ ");
+		cnsl::GetString(buffer, 1, 31);
+	}
+}

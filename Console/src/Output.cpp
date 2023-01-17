@@ -75,10 +75,36 @@ void InsertNewLine(int n)
 		InsertNewLine();
 }
 
+void InsertReverseLineFeed()
+{
+	COORD pos = GetCursorPosition();
+	if (pos.Y > 0)
+	{
+		pos.Y--;
+		SetCursorPosition(pos, nullptr);
+	}
+}
+
+void InsertReverseLineFeed(int n)
+{
+	for (int i = 0; i < n; i++)
+		InsertReverseLineFeed();
+}
+
+void InsertReverseNewLine()
+{
+	putchar(CHARRIGE);
+	InsertReverseLineFeed();
+}
+
+void InsertReverseNewLine(int n)
+{
+	for (int i = 0; i < n; i++)
+		InsertReverseNewLine();
+}
+
 void InsertBackspace()
 {
-	putchar(BACKSPACE);
-	putchar(SPACE);
 	putchar(BACKSPACE);
 }
 
@@ -86,6 +112,19 @@ void InsertBackspace(int n)
 {
 	for (int i = 0; i < n; i++)
 		InsertBackspace();
+}
+
+void InsertDelete()
+{
+	putchar(BACKSPACE);
+	putchar(SPACE);
+	putchar(BACKSPACE);
+}
+
+void InsertDelete(int n)
+{
+	for (int i = 0; i < n; i++)
+		InsertDelete();
 }
 
 void InsertChar(const char ch)
@@ -118,6 +157,29 @@ void InsertText(const char* format, ...)
 		else
 			InsertChar(*p);
 	}
+}
+
+void InsertText(WORD foreground, const char* format, ...)
+{
+	static char buffer[256];
+
+	if (!format)
+		return;
+
+	va_list args;
+	va_start(args, format);
+	vsprintf_s(buffer, format, args);
+	va_end(args);
+
+	WORD old = SetTextForeground(foreground);
+	for (const char* p = buffer; *p; p++)
+	{
+		if (IsNewLine(*p))
+			InsertNewLine();
+		else
+			InsertChar(*p);
+	}
+	SetTextForeground(old);
 }
 
 void InsertSplitLine(char split)
