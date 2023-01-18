@@ -61,7 +61,7 @@ bool Config::Load()
 	}
 
 	fseek(input, 0, SEEK_END);
-	char* buffer = new char[ftell(input) / 2 + 32];
+	char* buffer = new char[ftell(input) + 32];
 	fseek(input, 0, SEEK_SET);
 
 	tea::TEAFileReader* reader = new tea::TEAFileReader(input);

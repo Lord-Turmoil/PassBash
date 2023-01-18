@@ -56,7 +56,7 @@ bool PassDoc::Load(const char* password)
 	}
 
 	fseek(input, 0, SEEK_END);
-	char* xml = new char[ftell(input) / 2 + 128];
+	char* xml = new char[ftell(input) + 128];
 	fseek(input, 0, SEEK_SET);
 
 	tea::TEAFileReader* reader = new tea::TEAFileReader(input);
@@ -171,7 +171,7 @@ void PassDoc::GetWorkingDirectory(XMLElementPtr node, std::string& path)
 	while (node != m_root)
 	{
 		chain.push(node);
-		node = GetNodeParent(node);
+		node = GetParentNode(node);
 	}
 	chain.push(node);
 
@@ -220,6 +220,24 @@ XMLElementPtr CreateNode(const char* tag)
 	return g_passDoc.NewElement(tag);
 }
 
+
+void DeleteNode(XMLElementPtr node)
+{
+	g_passDoc.DeleteElement(node);
+}
+
+XMLElementPtr AddChildNode(XMLElementPtr node, XMLElementPtr child)
+{
+	node->InsertEndChild(child);
+	return child;
+}
+
+
+/*
+**+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+** Group and Item
+**+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+*/
 XMLElementPtr GetDirectChildNode(XMLElementPtr node, const char* name)
 {
 	if (!name)
@@ -257,11 +275,6 @@ bool GetChildren(XMLElementPtr node, XMLElementPtrList& nodes)
 	return true;
 }
 
-XMLElementPtr AddChildNode(XMLElementPtr node, XMLElementPtr child)
-{
-	node->InsertEndChild(child);
-	return child;
-}
 
 XMLElementPtr GetNodeByPath(const std::string& path)
 {
@@ -287,7 +300,7 @@ XMLElementPtr GetNodeByPath(const std::string& path)
 		if (_STR_SAME(token, PARENT_DIR_NAME))
 		{
 			if (node != g_passDoc.GetRoot())
-				node = GetNodeParent(node);
+				node = GetParentNode(node);
 		}
 		else if (_STR_SAME(token, SELF_DIR_NAME))
 			node = node;
@@ -348,6 +361,9 @@ XMLElementPtr GetChildNodeByPath(const std::string& path)
 	}
 	free(buffer);	// strdup
 
+	if (node == current)
+		return nullptr;
+
 	if (isChild)
 		return node;
 	else
@@ -368,6 +384,25 @@ XMLElementPtr GetOrCreateChildNode(XMLElementPtr node, const char* tag, const ch
 	return child;
 }
 
+
+void DeleteChildNode(XMLElementPtr node, const char* name)
+{
+	XMLElementPtr child = GetDirectChildNode(node, name);
+	if (child)
+		DeleteNode(child);
+}
+
+void DeleteChildren(XMLElementPtr node)
+{
+	node->DeleteChildren();
+}
+
+
+/*
+**+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+** Group Node
+**+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+*/
 XMLElementPtr CreateGroupNodeByPath(const std::string& path)
 {
 	char* buffer = _strdup(path.c_str());
@@ -389,7 +424,7 @@ XMLElementPtr CreateGroupNodeByPath(const std::string& path)
 		if (_STR_SAME(token, PARENT_DIR_NAME))
 		{
 			if (node != g_passDoc.GetRoot())
-				node = GetNodeParent(node);
+				node = GetParentNode(node);
 		}
 		else if (_STR_SAME(token, SELF_DIR_NAME))
 			node = node;
@@ -403,13 +438,70 @@ XMLElementPtr CreateGroupNodeByPath(const std::string& path)
 	return node;
 }
 
-void DeleteNode(XMLElementPtr node)
+
+/*
+**+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+** Item
+**+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+*/
+// This must create a new node! Use GetNodeByPath to check!
+XMLElementPtr CreateItemNodeByPath(const std::string& path, const char* name)
 {
-	g_passDoc.DeleteElement(node);
+	char* buffer = _strdup(path.c_str());
+	char* context = nullptr;
+
+	if (_STR_SAME(buffer, ROOT_DIR_NAME))
+		return g_passDoc.GetRoot();
+
+	// Absolute or relative.
+	XMLElementPtr node;
+	if (buffer[0] == '.' && buffer[1] == '/')
+		node = g_passDoc.GetRoot();
+	else
+		node = g_passDoc.GetCurrent();
+
+	char* token = strtok_s(buffer, "/", &context);
+	while (token)
+	{
+		if (_STR_SAME(token, PARENT_DIR_NAME))
+		{
+			if (node != g_passDoc.GetRoot())
+				node = GetParentNode(node);
+		}
+		else if (_STR_SAME(token, SELF_DIR_NAME))
+			node = node;
+		else
+			node = GetOrCreateChildNode(node, GROUP_TAG, token);
+
+		token = strtok_s(nullptr, "/", &context);
+	}
+	free(buffer);	// strdup
+
+	if (node)
+	{
+		node->SetName(ITEM_TAG);
+		node->SetAttribute("name", name);
+	}
+
+	return node;
+}
+
+void GetBaseName(const std::string& path, std::string& name)
+{
+	size_t pos = path.find_last_of('/');
+
+	if (pos == std::string::npos)
+		name = path;
+	else
+		name = path.substr(pos + 1);
 }
 
 
-
+/*
+**+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+** Entry
+**+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+*/
 bool GetEntry(XMLElementPtr node, const char* key, Entry* entry)
 {
 	if (!IsItem(node))
@@ -463,7 +555,7 @@ bool GetEntries(XMLElementPtr node, EntryList& entries)
 	return true;
 }
 
-XMLElementPtr GetOrCreateEntryNode(XMLElementPtr node, const char* key)
+XMLElementPtr GetEntryNode(XMLElementPtr node, const char* key)
 {
 	if (!IsItem(node))
 		return nullptr;
@@ -476,10 +568,20 @@ XMLElementPtr GetOrCreateEntryNode(XMLElementPtr node, const char* key)
 		p = p->NextSiblingElement();
 	}
 
+	return p;
+}
+
+XMLElementPtr GetOrCreateEntryNode(XMLElementPtr node, const char* key)
+{
+	if (!IsItem(node))
+		return nullptr;
+
+	XMLElementPtr p = GetEntryNode(node, key);
 	if (!p)
 	{
 		p = CreateNode(ENTRY_TAG);
 		p->SetAttribute("key", key);
+		AddChildNode(node, p);
 	}
 
 	return p;

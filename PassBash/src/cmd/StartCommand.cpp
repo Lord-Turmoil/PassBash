@@ -49,7 +49,9 @@ bool StartCommand::Handle(const ArgListPtr args)
 
 void StartCommand::_InitConsole()
 {
-	cnsl::InitConsole(110);
+	cnsl::InitConsoleSize(120, 30);
+	cnsl::InitConsole(116);
+
 	cnsl::SetHeader(g_TITLE, g_COPYRIGHT, g_AUTHOR);
 	cnsl::SetTextForeground(FOREGROUND_WHITE);
 	cnsl::SetTextBackground(BACKGROUND_BLACK);

@@ -33,7 +33,7 @@ const char BACKSPACE	= '\b';
 const char SPACE		= ' ';
 const char ESCAPE       = 27;
 
-const char SPECIAL_LEADING     = 224;
+const char SPECIAL_LEADING     = (char)224;
 const char SPECIAL_ARROW_UP    = 72;
 const char SPECIAL_ARROW_DOWN  = 80;
 const char SPECIAL_ARROW_LEFT  = 75;

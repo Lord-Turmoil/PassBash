@@ -32,6 +32,13 @@
 
 #include <cnsl.h>
 
+#ifdef max
+#undef max
+#endif
+#ifdef min
+#undef min
+#endif
+
 // Some colors.
 #define PROMPT_COLOR   FOREGROUND_LIGHT(FOREGROUND_BLUE)
 #define GREETING_COLOR FOREGROUND_GREEN
@@ -40,6 +47,8 @@
 #define GROUP_COLOR    FOREGROUND_CYAN
 #define PWD_COLOR      FOREGROUND_MAGENTA
 #define ITEM_COLOR     FOREGROUND_LIGHT(FOREGROUND_MAGENTA)
+#define ENTRY_MODIFY_COLOR FOREGROUND_LIGHT(FOREGROUND_GREEN)
+#define ENTRY_DELETE_COLOR FOREGROUND_LIGHT(FOREGROUND_RED)
 
 // Some errors.
 #define ARGUMENTS_ILLEGAL "Arguments illegal!"

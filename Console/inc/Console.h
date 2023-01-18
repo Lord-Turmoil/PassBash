@@ -93,6 +93,8 @@ const COORD ORIGIN = { 0, 0 };
 
 const ConsoleInfo* GetConsoleInfo();
 
+// for command prompt, Terminal won't be affected.
+void InitConsoleSize(SHORT width, SHORT height);
 void InitConsole(SHORT width = DFL_CNSL_WIDTH, SHORT height = DFL_CNSL_HEIGHT);
 void SetConsoleSize(SHORT width, SHORT height);
 SHORT GetConsoleWidth();

@@ -30,6 +30,8 @@
 #include <vector>
 #include <string>
 
+#include <Windows.h>
+
 
 typedef std::vector<std::string> ArgList;
 typedef ArgList* ArgListPtr;
@@ -109,7 +111,7 @@ public:
 	virtual bool Handle(const ArgListPtr args);
 
 private:
-	void _ReceivePassword();
+	bool _ReceivePassword();
 };
 
 // Host for other commands.
@@ -172,6 +174,7 @@ public:
 	virtual bool Handle(const ArgListPtr args);
 };
 
+// rm <node name>
 class RemoveCommand : public Command
 {
 public:
@@ -179,7 +182,20 @@ public:
 
 	virtual bool Handle(const ArgListPtr args);
 private:
-	bool _Confirm();
+	bool _Confirm(const char* prompt);
+	bool _DeleteRoot();
+	bool _DeleteCurrent();
+};
+
+// move <src> <dest>
+class MoveCommand : public Command
+{
+public:
+	DEFINE_CMD_CTOR(Move)
+
+	virtual bool Handle(const ArgListPtr args);
+
+private:
 };
 
 // save
@@ -203,6 +219,17 @@ private:
 	void _Tree(XMLElementPtr node, const std::string& leading);
 };
 
+class CatCommand : public Command
+{
+public:
+	DEFINE_CMD_CTOR(Cat)
+
+	virtual bool Handle(const ArgListPtr args);
+
+private:
+	void _See(XMLElementPtr item);
+};
+
 /*
 **+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 ** Minor Commands
@@ -224,6 +251,13 @@ public:
 	virtual bool Handle(const ArgListPtr args);
 };
 
+class HelpCommand : public Command
+{
+public:
+	DEFINE_CMD_CTOR(Help)
+
+	virtual bool Handle(const ArgListPtr args);
+};
 
 /*
 **+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -241,11 +275,12 @@ public:
 	EditCommand() : Command("Edit"), m_item(nullptr) {}
 	
 	virtual void OnStart();
+	virtual void OnEnd();
 	virtual bool Handle(const ArgListPtr args);
 
 private:
 	char* _SkipLeadingWhiteSpace(char* buffer);
-	
+	void _ParseType(const char* cmd, char* type);
 	void _EditPrompt();
 
 	// help  abbr. h
@@ -256,6 +291,7 @@ private:
 
 	// see  abbr. s
 	void _See();
+	void _See(const char* key, WORD color);	// highlight one entry
 
 	// set:key:value:weight
 	// setk:old key:new key
@@ -265,17 +301,34 @@ private:
 	void _SetKeyPrompt(char* cmd);
 	void _SetValuePrompt(char* cmd);
 	void _SetWeightPrompt(char* cmd);
-	void _SetKey(const char* oldKey, const char* newKey);
+	bool _SetKey(const char* oldKey, const char* newKey);
 	// nullptr for remain.
-	void _SetEntry(const char* key, const char* value, int* weight);
+	bool _SetEntry(const char* key, const char* value, const char* weightStr);
+
+	// ustd
+	void _UnSetIDPrompt(char* cmd);
 
 	// unset:key  abbr. u
-	void _UnSetPrompt(const char* cmd);
+	void _UnSetPrompt(char* cmd);
 	void _UnSet(const char* key);
 
 	void _UnRecognized(const char* cmd);
 	
 	XMLElementPtr m_item;
+};
+
+
+/*
+**+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+** Hidden command. This will export passwords.
+**+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+*/
+class CheatCommand : Command
+{
+public:
+	DEFINE_CMD_CTOR(Cheat)
+
+	virtual bool Handle(const ArgListPtr args);
 };
 
 #endif

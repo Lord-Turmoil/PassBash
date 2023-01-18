@@ -22,13 +22,24 @@
 
 #include "../inc/common/Macros.h"
 
-#ifndef PASH_TEST
+#if !PASH_TEST
 
-#include "../inc/cmd/Command.h"
 #include "../inc/cmd/CommandFactory.h"
+#include "../inc/cmd/Scheduler.h"
+
+
 int main()
 {
+	Scheduler::GetInstance()
+		->AddTask(CommandFactory::SpawnSpecial("Start"), nullptr);
+	Scheduler::GetInstance()->Run();
 
+#ifdef PASH_DEBUG
+	PRINT_ERROR();
+	PRINT_MESSAGE();
+#endif
+
+	return 0;
 }
 
 #endif

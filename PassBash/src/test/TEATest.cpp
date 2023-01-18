@@ -120,7 +120,7 @@ bool bufferDecode()
 		return false;
 	}
 	fseek(input, 0, SEEK_END);
-	size_t size = ftell(input) / 2 + 128;
+	size_t size = ftell(input) + 128;
 	char* buffer = new char[size];
 	fseek(input, 0, SEEK_SET);
 

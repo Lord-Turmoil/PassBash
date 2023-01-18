@@ -100,7 +100,7 @@ bool HostCommand::_PeekTask(Task& task)
 	char* token = strtok_s(buffer, HOST_IGNORE, &context);
 	if (!token)	// nothing.
 		return true;
-	else if (_STR_SAME(token, "quit"))
+	else if (_STR_SAME(token, "quit") || _STR_SAME(token, "q"))
 		return false;
 	
 	task.cmd = CommandFactory::Spawn(token);

@@ -56,6 +56,6 @@
 #endif
 
 // For unit test.
-#define PASH_TEST
+#define PASH_TEST 0
 
 #endif

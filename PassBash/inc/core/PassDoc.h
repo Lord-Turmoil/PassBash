@@ -90,14 +90,6 @@ private:
 ** Some utility functions for XMLElement info.
 **+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 */
-struct XMLElementPtrCompare
-{
-	bool operator()(const XMLElementPtr& lhs, const XMLElementPtr& rhs)
-	{
-		return strcmp(lhs->Name(), rhs->Name()) < 0;
-	};
-};
-
 typedef std::vector<XMLElementPtr> XMLElementPtrList;
 
 inline bool IsGroup(XMLElementPtr node)
@@ -120,11 +112,29 @@ inline const char* GetNodeAttr(XMLElementPtr node, const char* attr)
 	return node->Attribute(attr);
 }
 
-inline XMLElementPtr GetNodeParent(XMLElementPtr node)
+inline XMLElementPtr GetParentNode(XMLElementPtr node)
 {
 	return node->Parent()->ToElement();
 }
 
+struct XMLElementPtrCompare
+{
+	// Must be group or item! Both have name.
+	bool operator()(const XMLElementPtr& lhs, const XMLElementPtr& rhs)
+	{
+		const char* lhsName = GetNodeName(lhs);
+		const char* rhsName = GetNodeName(rhs);
+		if (!(lhsName && rhsName))
+			return false;
+		bool lhsGroup = IsGroup(lhs);
+		bool rhsGroup = IsGroup(rhs);
+		// same type
+		if ((lhsGroup && rhsGroup) || (!lhsGroup && !rhsGroup))
+			return strcmp(lhsName, rhsName) < 0;
+		// group in front
+		return lhsGroup;
+	};
+};
 
 /*
 **+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -151,12 +161,23 @@ XMLElementPtr GetChildNodeByPath(const std::string& path);
 
 XMLElementPtr GetOrCreateChildNode(XMLElementPtr node, const char* tag, const char* name);
 
+void DeleteChildNode(XMLElementPtr node, const char* name);
+void DeleteChildren(XMLElementPtr node);
+
 /*
 **+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 ** Group
 **+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 */
 XMLElementPtr CreateGroupNodeByPath(const std::string& path);
+
+/*
+**+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+** Item
+**+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+*/
+XMLElementPtr CreateItemNodeByPath(const std::string& path, const char* name);
+void GetBaseName(const std::string& path, std::string& name);
 
 /*
 **+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -194,7 +215,9 @@ typedef std::vector<Entry> EntryList;
 bool GetEntry(XMLElementPtr node, const char* key, Entry* entry);
 bool GetEntries(XMLElementPtr node, EntryList& entries);
 
+XMLElementPtr GetEntryNode(XMLElementPtr node, const char* key);
 XMLElementPtr GetOrCreateEntryNode(XMLElementPtr node, const char* key);
+
 // If exists, it will override current one.
 bool SetEntry(XMLElementPtr node, const Entry& entry);
 

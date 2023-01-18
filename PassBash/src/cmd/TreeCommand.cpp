@@ -52,7 +52,7 @@ bool TreeCommand::Handle(const ArgListPtr args)
 		XMLElementPtr node = GetNodeByPath((*args)[0]);
 		if (!node)
 		{
-			cnsl::InsertText(ERROR_COLOR, "Group doesn't exist!");
+			cnsl::InsertText(ERROR_COLOR, "Group doesn't exist!\n");
 			return false;
 		}
 		_Tree(node, " ");
@@ -73,26 +73,29 @@ void TreeCommand::_Tree(XMLElementPtr node, const std::string& leading)
 {
 	// First output itself, with leading previously added.
 	if (IsGroup(node))
-		cnsl::InsertText(GROUP_COLOR, " %s/", GetNodeName(node));
+		cnsl::InsertText(GROUP_COLOR, " %s/\n", GetNodeName(node));
 	else
-		cnsl::InsertText(ITEM_COLOR, " %s", GetNodeName(node));
-	cnsl::InsertNewLine();
+	{
+		cnsl::InsertText(ITEM_COLOR, " %s\n", GetNodeName(node));
+		return;
+	}
 
 	// Then, output its children with leading.
-	XMLElementPtr p = node->FirstChildElement();
-	while (p)
+	XMLElementPtrList list;
+	GetChildren(node, list);
+	for (auto it : list)
 	{
 		cnsl::InsertText("%s", leading.c_str());
-		if (p != node->LastChildElement())
+		if (it != list.back())
 		{
 			cnsl::InsertText("  |--");
-			_Tree(p, leading + "  |  ");
+			_Tree(it, leading + "  |  ");
 		}
 		else
 		{
 			cnsl::InsertText("  \\--");
-			_Tree(p, leading + "     ");
+			_Tree(it, leading + "     ");
 		}
-		p = p->NextSiblingElement();
+		it = it->NextSiblingElement();
 	}
 }

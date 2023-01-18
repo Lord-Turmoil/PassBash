@@ -29,7 +29,9 @@ void LoginCommand::OnStart()
 
 bool LoginCommand::Handle(const ArgListPtr args)
 {
-	_ReceivePassword();
+	if (!_ReceivePassword())
+		return false;
+
 	cnsl::InsertNewLine();
 	cnsl::InsertText(GREETING_COLOR, "Credential confirmed!");
 	Sleep(500);
@@ -43,13 +45,19 @@ bool LoginCommand::Handle(const ArgListPtr args)
 	return STATUS();
 }
 
-void LoginCommand::_ReceivePassword()
+bool LoginCommand::_ReceivePassword()
 {
 	char buffer[32];
+	int ret = 0;
 
 	cnsl::InsertText(MESSAGE_COLOR, "Please enter your master password.\n");
 	cnsl::InsertText(PROMPT_COLOR, "$ ");
-	cnsl::GetString(buffer, 1, 31);
+	do
+	{
+		ret = cnsl::GetPasswordInterruptable(buffer, 0, 31);
+		if (ret == -1)
+			return false;
+	} while (ret == 0);
 	while (g_password != buffer)
 	{
 		cnsl::InsertNewLine();
@@ -61,6 +69,13 @@ void LoginCommand::_ReceivePassword()
 		cnsl::InsertCarrige();
 
 		cnsl::InsertText(PROMPT_COLOR, "$ ");
-		cnsl::GetString(buffer, 1, 31);
+		do
+		{
+			ret = cnsl::GetPasswordInterruptable(buffer, 0, 31);
+			if (ret == -1)
+				return false;
+		} while (ret == 0);
 	}
+
+	return true;
 }

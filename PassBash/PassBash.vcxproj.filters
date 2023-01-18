@@ -51,9 +51,6 @@
     <ClInclude Include="inc\utility\Auxilliary.h">
       <Filter>Header Files\utility</Filter>
     </ClInclude>
-    <ClInclude Include="inc\core\Document.h">
-      <Filter>Header Files\core</Filter>
-    </ClInclude>
     <ClInclude Include="inc\core\Entry.h">
       <Filter>Header Files\core</Filter>
     </ClInclude>
@@ -96,6 +93,9 @@
     <ClInclude Include="inc\core\PassDoc.h">
       <Filter>Header Files\core</Filter>
     </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\utility\xml.cpp">
@@ -106,9 +106,6 @@
     </ClCompile>
     <ClCompile Include="src\test\TEATest.cpp">
       <Filter>Source Files\test</Filter>
-    </ClCompile>
-    <ClCompile Include="src\core\Document.cpp">
-      <Filter>Source Files\core</Filter>
     </ClCompile>
     <ClCompile Include="src\common\Logger.cpp">
       <Filter>Source Files\common</Filter>
@@ -167,5 +164,13 @@
     <ClCompile Include="src\cmd\EditCommand.cpp">
       <Filter>Source Files\cmd</Filter>
     </ClCompile>
+    <ClCompile Include="src\cmd\HelpCommand.cpp">
+      <Filter>Source Files\cmd</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="PassBash.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
   </ItemGroup>
 </Project>

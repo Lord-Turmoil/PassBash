@@ -150,18 +150,19 @@
     <ClInclude Include="inc\core\Entry.h" />
     <ClInclude Include="inc\core\Global.h" />
     <ClInclude Include="inc\core\MemPool.h" />
-    <ClInclude Include="inc\core\Document.h" />
     <ClInclude Include="inc\core\PassDoc.h" />
     <ClInclude Include="inc\utility\Auxilliary.h" />
     <ClInclude Include="inc\utility\IntrusiveList.h" />
     <ClInclude Include="inc\utility\OrderedList.h" />
     <ClInclude Include="inc\utility\tinyxml.h" />
     <ClInclude Include="inc\utility\xml.h" />
+    <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\cmd\Command.cpp" />
     <ClCompile Include="src\cmd\CommandFactory.cpp" />
     <ClCompile Include="src\cmd\EditCommand.cpp" />
+    <ClCompile Include="src\cmd\HelpCommand.cpp" />
     <ClCompile Include="src\cmd\HostCommand.cpp" />
     <ClCompile Include="src\cmd\LoginCommand.cpp" />
     <ClCompile Include="src\cmd\RegisterCommand.cpp" />
@@ -171,7 +172,6 @@
     <ClCompile Include="src\cmd\TreeCommand.cpp" />
     <ClCompile Include="src\common\Logger.cpp" />
     <ClCompile Include="src\core\Config.cpp" />
-    <ClCompile Include="src\core\Document.cpp" />
     <ClCompile Include="src\core\Global.cpp" />
     <ClCompile Include="src\core\PassDoc.cpp" />
     <ClCompile Include="src\Main.cpp" />
@@ -182,6 +182,9 @@
     <ClCompile Include="src\test\PassDocTest.cpp" />
     <ClCompile Include="src\test\TEATest.cpp" />
     <ClCompile Include="src\utility\xml.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="PassBash.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

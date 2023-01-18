@@ -25,10 +25,10 @@
 
 #include "Macros.h"
 
-#ifdef PASH_TEST
-
 // Ahh... #define can not nest #define
 #define TEST(PROJ) PASH_TEST_##PROJ
+
+#if PASH_TEST
 
 #define PASH_TEST_ORDERED_LIST 0	// Passed
 #define PASH_TEST_TEA          0	// Passed
@@ -36,7 +36,7 @@
 #define PASH_TEST_PASSDOC      0	// Passed
 #define PASH_TEST_CONFIG       0	// Passed
 
-#define PASH_TEST_MAIN         1
+#define PASH_TEST_MAIN         1	// Passed
 
 #endif
 

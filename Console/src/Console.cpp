@@ -78,6 +78,13 @@ static bool IsValidPosition(const COORD& coord)
 }
 
 
+void InitConsoleSize(SHORT width, SHORT height)
+{
+	char msg[48];
+	sprintf_s(msg, "mode con cols=%hd lines=%hd", width, height);
+	system(msg);
+}
+
 void InitConsole(SHORT width, SHORT height)
 {
 	SetConsoleSize(width, height);

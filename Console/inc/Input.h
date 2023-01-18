@@ -46,6 +46,11 @@ void GetString(char* buffer, int minLen, int maxLen);
 int GetStringInterruptable(char* buffer, bool enable = true);
 int GetStringInterruptable(char* buffer, int minLen, int maxLen, bool enable = true);
 
+void GetPassword(char* buffer, char decoy = '*');
+void GetPassword(char* buffer, int minLen, int maxLen, char decoy = '*');
+// This can be interrupted by ESC or empty input.
+int GetPasswordInterruptable(char* buffer, char decoy = '*', bool enable = true);
+int GetPasswordInterruptable(char* buffer, int minLen, int maxLen, char decoy = '*', bool enable = true);
 
 template<typename _Ty>
 bool DefaultVerifier(_Ty value) { return true; }
