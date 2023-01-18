@@ -167,6 +167,9 @@
     <ClCompile Include="src\cmd\HelpCommand.cpp">
       <Filter>Source Files\cmd</Filter>
     </ClCompile>
+    <ClCompile Include="src\cmd\ChangePasswordCommand.cpp">
+      <Filter>Source Files\cmd</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="PassBash.rc">

@@ -104,7 +104,7 @@ bool ListCommand::Handle(const ArgListPtr args)
 	{
 		cnsl::InsertText(ERROR_COLOR, ARGUMENTS_ILLEGAL);
 		cnsl::InsertNewLine();
-		cnsl::InsertText(MESSAGE_COLOR, "Usage: ls <item name>");
+		cnsl::InsertText(MESSAGE_COLOR, "Usage: ls [group name]\n");
 		cnsl::InsertNewLine();
 		return false;
 	}
@@ -115,11 +115,16 @@ bool ListCommand::Handle(const ArgListPtr args)
 		GetChildren(current, list);
 	else
 	{
-		const std::string& name = (*args)[0];
-		XMLElementPtr node = GetDirectChildNode(current, name.c_str());
+		const std::string& path = (*args)[0];
+		XMLElementPtr node = GetNodeByPath(path);
 		if (!node)
 		{
-			cnsl::InsertText(ERROR_COLOR, "Group doesn't exist!");
+			cnsl::InsertText(ERROR_COLOR, "Group doesn't exist!\n");
+			return false;
+		}
+		else if (!IsGroup(node))
+		{
+			cnsl::InsertText(ERROR_COLOR, "You can only list a group.\n");
 			return false;
 		}
 		GetChildren(node, list);
@@ -247,7 +252,12 @@ bool RemoveCommand::Handle(const ArgListPtr args)
 
 	// Remove root or self.
 	node = GetNodeByPath(path);
-	if (node == g_passDoc.GetRoot())
+	if (!node)
+	{
+		cnsl::InsertText(ERROR_COLOR, "No such thing to delete.\n");
+		return false;
+	}
+	else if (node == g_passDoc.GetRoot())
 		return _DeleteRoot();
 	else if (node == g_passDoc.GetCurrent())
 		return _DeleteCurrent();
@@ -450,7 +460,7 @@ void CatCommand::_See(XMLElementPtr item)
 		}
 		maxKey = std::max(maxKey, 20);
 		maxValue = std::max(maxValue, 20);
-		maxWeight = total - maxKey - maxValue;
+		maxWeight = std::min(total - maxKey - maxValue, 12);
 		cnsl::InsertText(MESSAGE_COLOR, "%4s | %*s | %*s | %*s\n",
 			"ID",
 			maxKey, "Key",
@@ -463,4 +473,62 @@ void CatCommand::_See(XMLElementPtr item)
 				maxKey, it.key, maxValue, it.value, maxWeight, it.weight);
 		}
 	}
+}
+
+
+/*
+**+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+** rename <
+**+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+*/
+bool RenameCommand::Handle(const ArgListPtr args)
+{
+	if (!args || (args->size() != 2))
+	{
+		cnsl::InsertText(ERROR_COLOR, ARGUMENTS_ILLEGAL);
+		cnsl::InsertNewLine();
+		cnsl::InsertText(MESSAGE_COLOR, "Usage: rename <old> <new>\n");
+		return false;
+	}
+
+	const std::string& srcPath = (*args)[0];
+	const std::string& destName = (*args)[1];
+	XMLElementPtr node = GetNodeByPath(srcPath);
+
+	if (!node)
+	{
+		cnsl::InsertText(ERROR_COLOR, "Node doen't exist!\n");
+		return false;
+	}
+	if (node == g_passDoc.GetRoot())
+	{
+		cnsl::InsertText(ERROR_COLOR, "You can not rename root!\n");
+		return false;
+	}
+	if (!IsLegalNodeName(destName))
+	{
+		cnsl::InsertText(ERROR_COLOR, "Illegal node name!\n");
+		return false;
+	}
+
+	XMLElementPtr parent = GetParentNode(node);
+	if (GetDirectChildNode(parent, destName.c_str()))
+	{
+		cnsl::InsertText(ERROR_COLOR, "New name already exist!\n");
+		return false;
+	}
+	
+	std::string oldPath;
+	std::string newPath;
+	g_passDoc.GetWorkingDirectory(node, oldPath);
+	node->SetAttribute("name", destName.c_str());
+	g_passDoc.GetWorkingDirectory(node, newPath);
+	
+	cnsl::InsertText(MESSAGE_COLOR,
+		"Rename \"%s\" to \"%s\".\n",
+		oldPath.c_str(), newPath.c_str());
+
+	g_passDoc.Mark();
+
+	return true;
 }

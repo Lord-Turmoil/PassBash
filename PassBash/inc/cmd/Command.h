@@ -132,6 +132,21 @@ private:
 	void _RecycleTask(Task& task);
 };
 
+// Change password command. Called by host.
+class ChangePasswordCommand : public Command
+{
+public:
+	DEFINE_CMD_CTOR(ChangePassword);
+
+	virtual void OnStart();
+	virtual bool Handle(const ArgListPtr args);
+
+private:
+	bool _Authorize();
+	bool _ReceivePassword();
+	bool _ReEncryptData();
+};
+
 
 /*
 **+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -219,6 +234,11 @@ private:
 	void _Tree(XMLElementPtr node, const std::string& leading);
 };
 
+/*
+**+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+** cat <item name>
+**+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+*/
 class CatCommand : public Command
 {
 public:
@@ -229,6 +249,16 @@ public:
 private:
 	void _See(XMLElementPtr item);
 };
+
+// rename <old> <new>
+class RenameCommand : public Command
+{
+public:
+	DEFINE_CMD_CTOR(Rename)
+
+	virtual bool Handle(const ArgListPtr args);
+};
+
 
 /*
 **+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+

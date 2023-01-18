@@ -117,6 +117,13 @@ inline XMLElementPtr GetParentNode(XMLElementPtr node)
 	return node->Parent()->ToElement();
 }
 
+inline bool IsLegalNodeName(const std::string& name)
+{
+	return (
+		(name.find('/') == std::string::npos) &&
+		(name.find(' ') == std::string::npos));
+}
+
 struct XMLElementPtrCompare
 {
 	// Must be group or item! Both have name.

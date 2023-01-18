@@ -202,6 +202,8 @@ void Clear(SHORT left, SHORT right)
 		putchar(' ');
 		left++;
 	}
+
+	InsertCarrige();
 }
 
 void Clear(const COORD& upperLeft, const COORD& bottomRight)

@@ -53,6 +53,8 @@ CommandPtr CommandFactory::Spawn(const char* cmd)
 		ret = CommandPtr(new TouchCommand());
 	else if (_STR_SAME(cmd, "mkdir"))
 		ret = CommandPtr(new MkdirCommand());
+	else if (_STR_SAME(cmd, "rename"))
+		ret = CommandPtr(new RenameCommand());
 	else if (_STR_SAME(cmd, "rm"))
 		ret = CommandPtr(new RemoveCommand());
 	else if (_STR_SAME(cmd, "mv") || _STR_SAME(cmd, "move"))
@@ -61,6 +63,8 @@ CommandPtr CommandFactory::Spawn(const char* cmd)
 		ret = CommandPtr(new HelpCommand());
 	else if (_STR_SAME(cmd, "save") || _STR_SAME(cmd, "s"))
 		ret = CommandPtr(new SaveCommand());
+	else if (_STR_SAME(cmd, "remaster"))
+		ret = CommandPtr(new ChangePasswordCommand());
 	
 	return ret;
 }

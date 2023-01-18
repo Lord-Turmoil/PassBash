@@ -43,6 +43,10 @@ bool HelpCommand::Handle(const ArgListPtr args)
 	cnsl::InsertText("                  usage: mkdir <group name>\n\n");
 	cnsl::InsertText("        touch -- create new password item recursively\n");
 	cnsl::InsertText("                  usage: touch <item name>\n\n");
+	cnsl::InsertText("          cat -- show the content of a password item\n");
+	cnsl::InsertText("                  usage: cat <item name>\n\n");
+	cnsl::InsertText("       rename -- rename a group or item\n");
+	cnsl::InsertText("                  usage: rename <old> <new>\n\n");
 	cnsl::InsertText("           ls -- list group and item in current group or specified group\n");
 	cnsl::InsertText("                  usage: ls [group name]\n\n");
 	cnsl::InsertText("         tree -- list nodes in tree form\n");
@@ -53,6 +57,8 @@ bool HelpCommand::Handle(const ArgListPtr args)
 	cnsl::InsertText("                  usage: move <src> <dest>\n\n");
 	cnsl::InsertText("      save, s -- save changes\n");
 	cnsl::InsertText("                  usage: save\n\n");
+	cnsl::InsertText("     remaster -- reset master password\n");
+	cnsl::InsertText("                  usage: remaster\n\n");
 	cnsl::InsertText("      quit, q -- quit edit mode\n");
 	cnsl::InsertSplitLine('_');
 	cnsl::InsertNewLine();

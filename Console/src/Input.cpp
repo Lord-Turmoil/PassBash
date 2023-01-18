@@ -73,10 +73,8 @@ int GetStringInterruptable(char* buffer, int minLen, int maxLen, bool enable)
 		ch = _getch();
 		if (IsTerminator(ch))
 		{
-			if (length >= minLen)
+			if (length >= minLen || enable)
 				return length;
-			else if (enable)
-				return -1;
 		}
 		else if ((ch == ESCAPE) && enable)
 		{
@@ -192,10 +190,8 @@ int GetPasswordInterruptable(char* buffer, int minLen, int maxLen, char decoy, b
 		ch = _getch();
 		if (IsTerminator(ch))
 		{
-			if (length >= minLen)
+			if (length >= minLen || enable)
 				return length;
-			else if (enable)
-				return -1;
 		}
 		else if ((ch == ESCAPE) && enable)
 		{

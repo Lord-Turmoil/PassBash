@@ -159,6 +159,7 @@
     <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\cmd\ChangePasswordCommand.cpp" />
     <ClCompile Include="src\cmd\Command.cpp" />
     <ClCompile Include="src\cmd\CommandFactory.cpp" />
     <ClCompile Include="src\cmd\EditCommand.cpp" />

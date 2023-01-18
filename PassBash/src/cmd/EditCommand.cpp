@@ -24,7 +24,7 @@
 
 static const char EDIT_IGNORE[] = ":";
 static const int EDIT_KEY_MAX_LENGTH = 30;
-static const int EDIT_VALUE_MAX_LENGTH = 30;
+static const int EDIT_VALUE_MAX_LENGTH = 40;
 static const int EDIT_WEIGHT_MAX_LENGTH = 9;
 
 void EditCommand::OnStart()
@@ -150,7 +150,7 @@ void EditCommand::_Help()
 	cnsl::InsertText("        clear, c -- clear screen\n\n");
 	cnsl::InsertText("          see, s -- show current password item\n\n");
 	cnsl::InsertText("         set, st -- create or overwrite entry\n");
-	cnsl::InsertText("                    usage: set key:value[:weight=0]\n\n");
+	cnsl::InsertText("                    usage: set key:value[:weight=auto]\n\n");
 	cnsl::InsertText("        setk, sk -- reset key field, old-key must exist\n");
 	cnsl::InsertText("                    usage: setk old-key:new-key\n\n");
 	cnsl::InsertText("        setv, sv -- reset value field, key must exist\n");
@@ -204,7 +204,7 @@ void EditCommand::_See(const char* key, WORD color)
 		}
 		maxKey = std::max(maxKey, 20);
 		maxValue = std::max(maxValue, 20);
-		maxWeight = total - maxKey - maxValue;
+		maxWeight = std::min(total - maxKey - maxValue, 12);
 		cnsl::InsertText(MESSAGE_COLOR, "%4s | %*s | %*s | %*s\n",
 			"ID",
 			maxKey, "Key",
@@ -236,7 +236,7 @@ void EditCommand::_SetPrompt(char* cmd)
 
 	char* context = nullptr;
 	char* token = strtok_s(cmd, EDIT_IGNORE, &context);
-	const char* args[3]{ nullptr, nullptr, "0" };
+	const char* args[3]{ nullptr, nullptr, "-1" };
 	int pos;
 	for (pos = 0; pos < 3; pos++)
 	{
@@ -251,7 +251,7 @@ void EditCommand::_SetPrompt(char* cmd)
 	if (pos < 2)
 	{
 		// Arguments illegal!
-		cnsl::InsertText(ERROR_COLOR, "Usage: set key:value[:weight=0]\n");
+		cnsl::InsertText(ERROR_COLOR, "Usage: setw key:value[:weight=auto]\n");
 		return;
 	}
 
@@ -282,7 +282,7 @@ void EditCommand::_SetKeyPrompt(char* cmd)
 	if (pos != 2)
 	{
 		// Arguments illegal!
-		cnsl::InsertText(ERROR_COLOR, "Usage: setk old-key:new-key");
+		cnsl::InsertText(ERROR_COLOR, "Usage: setk old-key:new-key\n");
 		return;
 	}
 
@@ -313,7 +313,7 @@ void EditCommand::_SetValuePrompt(char* cmd)
 	if (pos != 2)
 	{
 		// Arguments illegal!
-		cnsl::InsertText(ERROR_COLOR, "Usage: set key:value");
+		cnsl::InsertText(ERROR_COLOR, "Usage: set key:value\n");
 		return;
 	}
 
@@ -344,7 +344,7 @@ void EditCommand::_SetWeightPrompt(char* cmd)
 	if (pos != 2)
 	{
 		// Arguments illegal!
-		cnsl::InsertText(ERROR_COLOR, "Usage: set key:weight");
+		cnsl::InsertText(ERROR_COLOR, "Usage: set key:weight\n");
 		return;
 	}
 
@@ -363,7 +363,7 @@ bool EditCommand::_SetKey(const char* oldKey, const char* newKey)
 	if (oldKey && (strlen(oldKey) > EDIT_KEY_MAX_LENGTH))
 	{
 		cnsl::InsertText(ERROR_COLOR,
-			"Old key is too long! No longer than %d characters!",
+			"Old key is too long! No longer than %d characters!\n",
 			EDIT_KEY_MAX_LENGTH);
 		return false;
 	}
@@ -372,7 +372,7 @@ bool EditCommand::_SetKey(const char* oldKey, const char* newKey)
 		if (strlen(newKey) > 30)
 		{
 			cnsl::InsertText(ERROR_COLOR,
-				"New key is too long! No longer than %d characters!",
+				"New key is too long! No longer than %d characters!\n",
 				EDIT_KEY_MAX_LENGTH);
 			return false;
 		}
@@ -403,7 +403,7 @@ bool EditCommand::_SetEntry(const char* key, const char* value, const char* weig
 	if (key && (strlen(key) > 30))
 	{
 		cnsl::InsertText(ERROR_COLOR,
-			"Key is too long! No longer than %d characters!",
+			"Key is too long! No longer than %d characters!\n",
 			EDIT_KEY_MAX_LENGTH);
 		return false;
 	}
@@ -412,7 +412,7 @@ bool EditCommand::_SetEntry(const char* key, const char* value, const char* weig
 		if (strlen(value) > 30)
 		{
 			cnsl::InsertText(ERROR_COLOR,
-				"Key is too long! No longer than %d characters!",
+				"Value is too long! No longer than %d characters!\n",
 				EDIT_VALUE_MAX_LENGTH);
 			return false;
 		}
@@ -423,7 +423,7 @@ bool EditCommand::_SetEntry(const char* key, const char* value, const char* weig
 		if (strlen(weightStr) > 9)
 		{
 			cnsl::InsertText(ERROR_COLOR,
-				"Key is too long! No longer than %d characters!",
+				"Key is too long! No longer than %d characters!\n",
 				EDIT_WEIGHT_MAX_LENGTH);
 			return false;
 		}
@@ -431,6 +431,12 @@ bool EditCommand::_SetEntry(const char* key, const char* value, const char* weig
 		int w;
 		if (tinyxml2::XMLUtil::ToInt(weightStr, &w))
 			weight = w;
+		if (weight == -1)	// auto
+		{
+			EntryList list;
+			GetEntries(m_item, list);
+			weight = list.back().weight + 4;
+		}
 		entry->SetAttribute("weight", weight);
 	}
 
@@ -450,7 +456,7 @@ void EditCommand::_UnSetIDPrompt(char* cmd)
 	if (!token)
 	{
 		// Arguments illegal!
-		cnsl::InsertText(ERROR_COLOR, "Usage: ustid id");
+		cnsl::InsertText(ERROR_COLOR, "Usage: ustid id\n");
 		return;
 	}
 
