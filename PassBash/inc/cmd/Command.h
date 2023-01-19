@@ -311,6 +311,7 @@ public:
 private:
 	char* _SkipLeadingWhiteSpace(char* buffer);
 	void _ParseType(const char* cmd, char* type);
+	char* _ParseCommand(char* cmd);
 	void _EditPrompt();
 
 	// help  abbr. h

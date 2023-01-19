@@ -22,9 +22,9 @@
 
 #include "../../inc/cmd/CommandHeader.h"
 
-static const char EDIT_IGNORE[] = ":";
+static const char EDIT_IGNORE[] = "|";
 static const int EDIT_KEY_MAX_LENGTH = 30;
-static const int EDIT_VALUE_MAX_LENGTH = 40;
+static const int EDIT_VALUE_MAX_LENGTH = 45;
 static const int EDIT_WEIGHT_MAX_LENGTH = 9;
 
 void EditCommand::OnStart()
@@ -34,7 +34,6 @@ void EditCommand::OnStart()
 void EditCommand::OnEnd()
 {
 	m_item = nullptr;
-	cnsl::InsertHeaderLine("Edit End", '-');
 }
 
 bool EditCommand::Handle(const ArgListPtr args)
@@ -44,7 +43,6 @@ bool EditCommand::Handle(const ArgListPtr args)
 		cnsl::InsertText(ERROR_COLOR, ARGUMENTS_ILLEGAL);
 		cnsl::InsertNewLine();
 		cnsl::InsertText(MESSAGE_COLOR, "Usage: mod <item name>\n");
-		cnsl::InsertNewLine();
 		return false;
 	}
 
@@ -95,6 +93,18 @@ void EditCommand::_ParseType(const char* cmd, char* type)
 	*type = '\0';
 }
 
+char* EditCommand::_ParseCommand(char* cmd)
+{
+	char* p = cmd;
+	while (*p && (*p != ' '))
+		p++;
+	while (*p && (*p == ' '))
+		p++;
+
+	return p;
+}
+
+
 void EditCommand::_EditPrompt()
 {
 	char buffer[128];
@@ -109,6 +119,7 @@ void EditCommand::_EditPrompt()
 		{
 			char* cmd = _SkipLeadingWhiteSpace(buffer);
 			_ParseType(cmd, type);
+			cmd = _ParseCommand(cmd);
 			if (_STR_NSAME(type, "h") || _STR_NSAME(type, "help"))
 				_Help();
 			else if (_STR_SAME(type, "c") || _STR_SAME(type, "clear"))
@@ -137,6 +148,7 @@ void EditCommand::_EditPrompt()
 	}
 
 	cnsl::InsertNewLine();
+	cnsl::InsertHeaderLine("Edit End", '-');
 }
 
 void EditCommand::_Help()
@@ -145,18 +157,18 @@ void EditCommand::_Help()
 
 	cnsl::InsertHeaderLine("Edit Help", '_');
 	cnsl::InsertNewLine();
-	cnsl::InsertText(" Tips: There shall not be extra space around ':'\n\n");
+	cnsl::InsertText(" Tips: There shall not be extra space around '|'\n\n");
 	cnsl::InsertText("         help, h -- show help\n\n");
 	cnsl::InsertText("        clear, c -- clear screen\n\n");
 	cnsl::InsertText("          see, s -- show current password item\n\n");
 	cnsl::InsertText("         set, st -- create or overwrite entry\n");
-	cnsl::InsertText("                    usage: set key:value[:weight=auto]\n\n");
+	cnsl::InsertText("                    usage: set key|value[|weight=auto]\n\n");
 	cnsl::InsertText("        setk, sk -- reset key field, old-key must exist\n");
-	cnsl::InsertText("                    usage: setk old-key:new-key\n\n");
+	cnsl::InsertText("                    usage: setk old-key|new-key\n\n");
 	cnsl::InsertText("        setv, sv -- reset value field, key must exist\n");
-	cnsl::InsertText("                    usage: setv key:value\n\n");
+	cnsl::InsertText("                    usage: setv key|value\n\n");
 	cnsl::InsertText("        setw, sw -- reset weight field, key must exist\n");
-	cnsl::InsertText("                    usage: setw key:weight\n\n");
+	cnsl::InsertText("                    usage: setw key|weight\n\n");
 	cnsl::InsertText("      unset, ust -- delete entry, key must exist\n");
 	cnsl::InsertText("                    usage: unset key\n\n");
 	cnsl::InsertText("      ustid, usd -- delete entry by id, id must exist\n");
@@ -230,10 +242,6 @@ void EditCommand::_See(const char* key, WORD color)
 // cmd[set key:value:weight]
 void EditCommand::_SetPrompt(char* cmd)
 {
-	while (*cmd && *cmd != ' ')	// skip "set ", and there must be at lease these.
-		cmd++;
-	cmd++;
-
 	char* context = nullptr;
 	char* token = strtok_s(cmd, EDIT_IGNORE, &context);
 	const char* args[3]{ nullptr, nullptr, "-1" };
@@ -251,7 +259,7 @@ void EditCommand::_SetPrompt(char* cmd)
 	if (pos < 2)
 	{
 		// Arguments illegal!
-		cnsl::InsertText(ERROR_COLOR, "Usage: setw key:value[:weight=auto]\n");
+		cnsl::InsertText(ERROR_COLOR, "Usage: setw key|value[|weight=auto]\n");
 		return;
 	}
 
@@ -261,10 +269,6 @@ void EditCommand::_SetPrompt(char* cmd)
 // setk old-key:new-key
 void EditCommand::_SetKeyPrompt(char* cmd)
 {
-	while (*cmd && *cmd != ' ')
-		cmd++;
-	cmd++;
-
 	char* context = nullptr;
 	char* token = strtok_s(cmd, EDIT_IGNORE, &context);
 	const char* args[2]{ nullptr, nullptr };
@@ -282,7 +286,7 @@ void EditCommand::_SetKeyPrompt(char* cmd)
 	if (pos != 2)
 	{
 		// Arguments illegal!
-		cnsl::InsertText(ERROR_COLOR, "Usage: setk old-key:new-key\n");
+		cnsl::InsertText(ERROR_COLOR, "Usage: setk old-key|new-key\n");
 		return;
 	}
 
@@ -292,10 +296,6 @@ void EditCommand::_SetKeyPrompt(char* cmd)
 // setv key:value
 void EditCommand::_SetValuePrompt(char* cmd)
 {
-	while (*cmd && *cmd != ' ')
-		cmd++;
-	cmd++;
-
 	char* context = nullptr;
 	char* token = strtok_s(cmd, EDIT_IGNORE, &context);
 	const char* args[2]{ nullptr, nullptr };
@@ -313,7 +313,7 @@ void EditCommand::_SetValuePrompt(char* cmd)
 	if (pos != 2)
 	{
 		// Arguments illegal!
-		cnsl::InsertText(ERROR_COLOR, "Usage: set key:value\n");
+		cnsl::InsertText(ERROR_COLOR, "Usage: set key|value\n");
 		return;
 	}
 
@@ -323,10 +323,6 @@ void EditCommand::_SetValuePrompt(char* cmd)
 // setw key:weight
 void EditCommand::_SetWeightPrompt(char* cmd)
 {
-	while (*cmd && *cmd != ' ')
-		cmd++;
-	cmd++;
-
 	char* context = nullptr;
 	char* token = strtok_s(cmd, EDIT_IGNORE, &context);
 	const char* args[2]{ nullptr, nullptr };
@@ -344,7 +340,7 @@ void EditCommand::_SetWeightPrompt(char* cmd)
 	if (pos != 2)
 	{
 		// Arguments illegal!
-		cnsl::InsertText(ERROR_COLOR, "Usage: set key:weight\n");
+		cnsl::InsertText(ERROR_COLOR, "Usage: set key|weight\n");
 		return;
 	}
 
@@ -400,7 +396,7 @@ bool EditCommand::_SetEntry(const char* key, const char* value, const char* weig
 		return false;
 	}
 
-	if (key && (strlen(key) > 30))
+	if (key && (strlen(key) > EDIT_KEY_MAX_LENGTH))
 	{
 		cnsl::InsertText(ERROR_COLOR,
 			"Key is too long! No longer than %d characters!\n",
@@ -409,7 +405,7 @@ bool EditCommand::_SetEntry(const char* key, const char* value, const char* weig
 	}
 	if (value)
 	{
-		if (strlen(value) > 30)
+		if (strlen(value) > EDIT_VALUE_MAX_LENGTH)
 		{
 			cnsl::InsertText(ERROR_COLOR,
 				"Value is too long! No longer than %d characters!\n",
@@ -420,7 +416,7 @@ bool EditCommand::_SetEntry(const char* key, const char* value, const char* weig
 	}
 	if (weightStr)
 	{
-		if (strlen(weightStr) > 9)
+		if (strlen(weightStr) > EDIT_WEIGHT_MAX_LENGTH)
 		{
 			cnsl::InsertText(ERROR_COLOR,
 				"Key is too long! No longer than %d characters!\n",
@@ -447,10 +443,6 @@ bool EditCommand::_SetEntry(const char* key, const char* value, const char* weig
 
 void EditCommand::_UnSetIDPrompt(char* cmd)
 {
-	while (*cmd && *cmd != ' ')	// skip "unset ", and there must be at lease these.
-		cmd++;
-	cmd++;
-
 	char* context = nullptr;
 	char* token = strtok_s(cmd, EDIT_IGNORE, &context);
 	if (!token)
@@ -481,10 +473,6 @@ void EditCommand::_UnSetIDPrompt(char* cmd)
 
 void EditCommand::_UnSetPrompt(char* cmd)
 {
-	while (*cmd && *cmd != ' ')	// skip "unset ", and there must be at lease these.
-		cmd++;
-	cmd++;
-
 	char* context = nullptr;
 	char* token = strtok_s(cmd, EDIT_IGNORE, &context);
 	if (!token)

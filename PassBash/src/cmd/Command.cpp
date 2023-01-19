@@ -364,6 +364,16 @@ bool MoveCommand::Handle(const ArgListPtr args)
 		return false;
 	}
 
+	/*
+	** 2022/01/19 TS:
+	** Fixed name duplicated bug.
+	*/
+	if (GetDirectChildNode(destGroup, GetNodeName(srcNode)))
+	{
+		cnsl::InsertText(ERROR_COLOR, "Name exists in destination group!\n");
+		return false;
+	}
+
 	// See tinyxml2, it will automatically move from old place.
 	std::string src;
 	std::string dest;
