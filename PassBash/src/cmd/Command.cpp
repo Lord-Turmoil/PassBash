@@ -34,7 +34,7 @@
 bool ClearCommand::Handle(const ArgListPtr args)
 {
 	cnsl::Clear();
-	cnsl::Print();
+	// cnsl::Print();
 
 	return true;
 }

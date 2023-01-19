@@ -171,7 +171,7 @@ void EditCommand::_Help()
 void EditCommand::_Clear()
 {
 	cnsl::Clear();
-	cnsl::Print();
+	// cnsl::Print();
 }
 
 void EditCommand::_See()
