@@ -48,7 +48,8 @@ public:
 	void UnLoad();
 	bool Save(const char* password);
 
-	// For debug purpose, export plain text to debug.xml.
+	// For debug purpose, import and export plain text to debug.xml.
+	bool Load();
 	bool Save();
 
 	bool IsLoaded() const;
@@ -72,7 +73,7 @@ public:
 	void Mark();
 
 private:
-	// Generate defualt data.
+	// Generate default data.
 	bool _GenerateData();
 
 private:
@@ -90,8 +91,6 @@ private:
 ** Some utility functions for XMLElement info.
 **+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 */
-typedef std::vector<XMLElementPtr> XMLElementPtrList;
-
 inline bool IsGroup(XMLElementPtr node)
 {
 	return _STR_SAME(node->Name(), GROUP_TAG);
@@ -152,6 +151,9 @@ XMLElementPtr CreateNode(const char* tag);
 void DeleteNode(XMLElementPtr node);
 
 XMLElementPtr AddChildNode(XMLElementPtr node, XMLElementPtr child);
+
+const char* GetNodePath(XMLElementPtr node, std::string& path);
+
 
 /*
 **+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+

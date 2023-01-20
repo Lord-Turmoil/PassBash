@@ -46,7 +46,8 @@ void HostCommand::OnStart()
 		Sleep(40);
 	}
 	cnsl::InsertDelete();
-	cnsl::InsertText(GREETING_COLOR, "\nPash Host fully operational!\n\n");
+	cnsl::InsertText(GREETING_COLOR, "\nPash Host fully operational!\n");
+	cnsl::InsertText(MESSAGE_COLOR, "User \"help\" for more information.\n\n");
 
 	cnsl::FlushInput();
 }

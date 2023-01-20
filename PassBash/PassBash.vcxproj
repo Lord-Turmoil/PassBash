@@ -160,9 +160,11 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\cmd\ChangePasswordCommand.cpp" />
+    <ClCompile Include="src\cmd\CheatCommand.cpp" />
     <ClCompile Include="src\cmd\Command.cpp" />
     <ClCompile Include="src\cmd\CommandFactory.cpp" />
     <ClCompile Include="src\cmd\EditCommand.cpp" />
+    <ClCompile Include="src\cmd\FindCommand.cpp" />
     <ClCompile Include="src\cmd\HelpCommand.cpp" />
     <ClCompile Include="src\cmd\HostCommand.cpp" />
     <ClCompile Include="src\cmd\LoginCommand.cpp" />

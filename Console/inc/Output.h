@@ -53,6 +53,7 @@ void InsertDelete();	// Clear the last character and went back by one.
 void InsertDelete(int n);
 
 void InsertChar(const char ch);
+void InsertChar(const char ch, int n);
 void InsertText(const char* format, ...);
 void InsertText(WORD foreground, const char* format, ...);
 

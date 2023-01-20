@@ -137,6 +137,12 @@ void InsertChar(const char ch)
 		putchar(ch);
 }
 
+void InsertChar(const char ch, int n)
+{
+	for (int i = 0; i < n; i++)
+		InsertChar(ch);
+}
+
 void InsertText(const char* format, ...)
 {
 	static char buffer[256];

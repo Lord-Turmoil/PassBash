@@ -57,6 +57,8 @@ bool PwdCommand::Handle(const ArgListPtr args)
 ** cd <group name>
 **+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 */
+XMLElementPtr ChangeDirectoryCommand::m_last = nullptr;
+
 bool ChangeDirectoryCommand::Handle(const ArgListPtr args)
 {
 	if (args && (args->size() != 1))
@@ -67,13 +69,16 @@ bool ChangeDirectoryCommand::Handle(const ArgListPtr args)
 		cnsl::InsertNewLine();
 		return false;
 	}
-
+	
 	const std::string& path = args ? (*args)[0] : "./";
 	XMLElementPtr node;
-	if (_STR_SAME(path.c_str(), ROOT_DIR_NAME))
+	if (path == ROOT_DIR_NAME)
 		node = g_passDoc.GetRoot();
+	else if (path == "-")
+		node = m_last;
 	else
-		node = GetNodeByPath((*args)[0]);
+		node = GetNodeByPath(path);
+
 	if (!node)
 	{
 		cnsl::InsertText(ERROR_COLOR, "Group doesn't exist!\n");
@@ -86,7 +91,7 @@ bool ChangeDirectoryCommand::Handle(const ArgListPtr args)
 		return false;
 	}
 
-	g_passDoc.SetCurrent(node);
+	m_last = g_passDoc.SetCurrent(node);
 	g_passDoc.GetPresentWorkingDirectory(g_pwd);
 
 	return true;
@@ -105,7 +110,6 @@ bool ListCommand::Handle(const ArgListPtr args)
 		cnsl::InsertText(ERROR_COLOR, ARGUMENTS_ILLEGAL);
 		cnsl::InsertNewLine();
 		cnsl::InsertText(MESSAGE_COLOR, "Usage: ls [group name]\n");
-		cnsl::InsertNewLine();
 		return false;
 	}
 
@@ -158,9 +162,8 @@ bool TouchCommand::Handle(const ArgListPtr args)
 	{
 		cnsl::InsertText(ERROR_COLOR, ARGUMENTS_ILLEGAL);
 		cnsl::InsertNewLine();
-		cnsl::InsertText(MESSAGE_COLOR, "Usage: touch <item name>");
+		cnsl::InsertText(MESSAGE_COLOR, "Usage: touch <item name>\n");
 		cnsl::InsertText(MESSAGE_COLOR, "Item name shall not contain white space. Use '-' instead.\n");
-		cnsl::InsertNewLine();
 		return false;
 	}
 
@@ -186,7 +189,7 @@ bool TouchCommand::Handle(const ArgListPtr args)
 		cnsl::InsertText(MESSAGE_COLOR, "Password item \"%s\" created.\n", path.c_str());
 	else
 	{
-		cnsl::InsertText(ERROR_COLOR, "Failded to create group \"%s\".\n", path.c_str());
+		cnsl::InsertText(ERROR_COLOR, "Failed to create group \"%s\".\n", path.c_str());
 		return false;
 	}
 

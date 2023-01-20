@@ -43,6 +43,8 @@ CommandPtr CommandFactory::Spawn(const char* cmd)
 		ret = CommandPtr(new ListCommand());
 	else if (_STR_SAME(cmd, "tree"))
 		ret = CommandPtr(new TreeCommand());
+	else if (_STR_SAME(cmd, "find"))
+		ret = CommandPtr(new FindCommand());
 	else if (_STR_SAME(cmd, "pwd"))
 		ret = CommandPtr(new PwdCommand());
 	else if (_STR_SAME(cmd, "clear") || _STR_SAME(cmd, "cls"))
@@ -59,12 +61,14 @@ CommandPtr CommandFactory::Spawn(const char* cmd)
 		ret = CommandPtr(new RemoveCommand());
 	else if (_STR_SAME(cmd, "mv") || _STR_SAME(cmd, "move"))
 		ret = CommandPtr(new MoveCommand());
-	else if (_STR_SAME(cmd, "help"))
+	else if (_STR_SAME(cmd, "h") || _STR_SAME(cmd, "help"))
 		ret = CommandPtr(new HelpCommand());
-	else if (_STR_SAME(cmd, "save") || _STR_SAME(cmd, "s"))
+	else if (_STR_SAME(cmd, "s") || _STR_SAME(cmd, "save"))
 		ret = CommandPtr(new SaveCommand());
 	else if (_STR_SAME(cmd, "remaster"))
 		ret = CommandPtr(new ChangePasswordCommand());
+	else if (_STR_SAME(cmd, "order"))
+		ret = CommandPtr(new CheatCommand());
 	
 	return ret;
 }

@@ -25,9 +25,14 @@
 
 #include <ctime>
 #include <cctype>
+#include <vector>
+#include <string>
 
 #ifdef max
 #undef max
+#endif
+#ifdef min
+#undef min
 #endif
 
 _CNSL_BEGIN
@@ -54,19 +59,21 @@ void GetString(char* buffer)
 void GetString(char* buffer, int minLen, int maxLen)
 {
 	minLen = std::max(minLen, 1);
-	GetStringInterruptable(buffer, minLen, maxLen, false);
+	GetStringInterruptible(buffer, minLen, maxLen, false);
 }
 
-int GetStringInterruptable(char* buffer, bool enable)
+int GetStringInterruptible(char* buffer, bool enable)
 {
-	return GetStringInterruptable(buffer, 1, INPUT_BUFFER_SIZE - 1, enable);
+	return GetStringInterruptible(buffer, 1, INPUT_BUFFER_SIZE - 1, enable);
 }
 
-int GetStringInterruptable(char* buffer, int minLen, int maxLen, bool enable)
+int GetStringInterruptible(char* buffer, int minLen, int maxLen, bool enable)
 {
 	int length = 0;
 	int pos = 0;
 	char ch;
+
+	buffer[0] = '\0';
 
 	for (; ;)
 	{

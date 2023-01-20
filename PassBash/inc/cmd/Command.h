@@ -160,6 +160,9 @@ public:
 	DEFINE_CMD_CTOR(ChangeDirectory)
 
 	virtual bool Handle(const ArgListPtr args);
+
+private:
+	static XMLElementPtr m_last;
 };
 
 // ls [group name]
@@ -349,12 +352,31 @@ private:
 };
 
 
+class FindCommand : public Command
+{
+public:
+	DEFINE_CMD_CTOR(Find)
+
+	void OnStart();
+	virtual bool Handle(const ArgListPtr args);
+
+private:
+	void _Find(XMLElementPtrList& list);
+	void _Search(XMLElementPtr root, XMLElementPtrList& list);
+	void _SearchItem(XMLElementPtr item, XMLElementPtrList& list);
+
+	bool m_deep;
+	bool m_strict;
+	std::string m_pattern;
+};
+
 /*
 **+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 ** Hidden command. This will export passwords.
 **+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 */
-class CheatCommand : Command
+// order [66]
+class CheatCommand : public Command
 {
 public:
 	DEFINE_CMD_CTOR(Cheat)

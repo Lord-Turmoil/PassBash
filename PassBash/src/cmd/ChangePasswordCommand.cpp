@@ -102,7 +102,7 @@ bool ChangePasswordCommand::_ReceivePassword()
 	{
 		cnsl::Clear(0);
 		cnsl::InsertText(PROMPT_COLOR, "$ ");
-		ret = cnsl::GetStringInterruptable(buffer, 6, 16);
+		ret = cnsl::GetStringInterruptible(buffer, 6, 16);
 		if (ret == -1)
 		{
 			cnsl::InsertNewLine();

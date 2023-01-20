@@ -30,6 +30,7 @@
 
 #include <tinyxml.h>
 
+typedef std::vector<XMLElementPtr> XMLElementPtrList;
 
 /********************************************************************
 ** There is a embarrassing situation that... Windows API supports

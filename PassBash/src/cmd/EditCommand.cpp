@@ -55,9 +55,12 @@ bool EditCommand::Handle(const ArgListPtr args)
 	if (!node)
 	{
 		cnsl::InsertText(ERROR_COLOR, "Password item doesn't exist!\n");
-		return false;
+		cnsl::InsertText(MESSAGE_COLOR, "Password item \"%s\" created.\n", path.c_str());
+		std::string name;
+		GetBaseName(path, name);
+		node = CreateItemNodeByPath(path, name.c_str());
 	}
-	if (!IsItem(node))
+	else if (!IsItem(node))
 	{
 		cnsl::InsertText(ERROR_COLOR, "You can only modify a password item!\n");
 		cnsl::InsertText(MESSAGE_COLOR, "Usage: mod <item name>\n");
@@ -69,6 +72,8 @@ bool EditCommand::Handle(const ArgListPtr args)
 	cnsl::InsertHeaderLine("Edit Mode", '-');
 	cnsl::InsertText(MESSAGE_COLOR, "Use \"help\" for more information.\n");
 	_EditPrompt();
+	cnsl::InsertNewLine();
+	cnsl::InsertHeaderLine("Edit End", '-');
 
 	g_passDoc.Mark();
 
@@ -112,7 +117,7 @@ void EditCommand::_EditPrompt()
 	int ret;
 	
 	cnsl::InsertText(PROMPT_COLOR, " %s> ", GetNodeName(m_item));
-	while ((ret = cnsl::GetStringInterruptable(buffer, 0, 127)) != -1)
+	while ((ret = cnsl::GetStringInterruptible(buffer, 0, 127)) != -1)
 	{
 		cnsl::InsertNewLine();
 		if (ret > 0)
@@ -139,16 +144,13 @@ void EditCommand::_EditPrompt()
 			else if (_STR_SAME(type, "ust") || _STR_SAME(type, "unset"))
 				_UnSetPrompt(cmd);
 			else if (_STR_SAME(type, "quit") || _STR_SAME(type, "q"))
-				return;
+				break;
 			else
 				_UnRecognized(type);
 		}
 			
 		cnsl::InsertText(PROMPT_COLOR, " %s> ", GetNodeName(m_item));
 	}
-
-	cnsl::InsertNewLine();
-	cnsl::InsertHeaderLine("Edit End", '-');
 }
 
 void EditCommand::_Help()
@@ -259,7 +261,7 @@ void EditCommand::_SetPrompt(char* cmd)
 	if (pos < 2)
 	{
 		// Arguments illegal!
-		cnsl::InsertText(ERROR_COLOR, "Usage: setw key|value[|weight=auto]\n");
+		cnsl::InsertText(ERROR_COLOR, "Usage: set key|value[|weight=auto]\n");
 		return;
 	}
 

@@ -114,9 +114,27 @@ bool PassDoc::Save(const char* password)
 	return true;
 }
 
+bool PassDoc::Load()
+{
+#ifdef PASH_CHEAT
+	if (!m_file.Load("debug.xml"))
+	{
+		LOG_ERROR("Failed to import data.");
+		return false;
+	}
+	m_root = m_file.GetRoot();
+	m_current = m_root;
+	GetPresentWorkingDirectory(g_pwd);
+	return true;
+#else
+	LOG_ERROR("A pathetic attempt.");
+	return false;
+#endif
+}
+
 bool PassDoc::Save()
 {
-#ifdef PASH_DEBUG
+#ifdef PASH_CHEAT
 	m_file.Save("debug.xml");
 	return true;
 #else
@@ -230,6 +248,12 @@ XMLElementPtr AddChildNode(XMLElementPtr node, XMLElementPtr child)
 {
 	node->InsertEndChild(child);
 	return child;
+}
+
+const char* GetNodePath(XMLElementPtr node, std::string& path)
+{
+	g_passDoc.GetWorkingDirectory(node, path);
+	return path.c_str();
 }
 
 

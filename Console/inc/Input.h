@@ -43,8 +43,8 @@ extern char buffer[INPUT_BUFFER_SIZE];
 void GetString(char* buffer);
 void GetString(char* buffer, int minLen, int maxLen);
 // This can be interrupted by ESC or empty input.
-int GetStringInterruptable(char* buffer, bool enable = true);
-int GetStringInterruptable(char* buffer, int minLen, int maxLen, bool enable = true);
+int GetStringInterruptible(char* buffer, bool enable = true);
+int GetStringInterruptible(char* buffer, int minLen, int maxLen, bool enable = true);
 
 void GetPassword(char* buffer, char decoy = '*');
 void GetPassword(char* buffer, int minLen, int maxLen, char decoy = '*');

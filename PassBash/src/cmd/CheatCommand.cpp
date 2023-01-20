@@ -1,65 +1,77 @@
 /******************************************************************************
  ***                        T O N Y ' S  S T U D I O                        ***
  ******************************************************************************
- *                   Project Name : PassBash                                  *
+ *                   Project Name : PashBash                                  *
  *                                                                            *
- *                      File Name : Macros.h                                  *
+ *                      File Name : CheatCommand.cpp                          *
  *                                                                            *
  *                     Programmer : Tony Skywalker                            *
  *                                                                            *
- *                     Start Date : January 15, 2023                          *
+ *                     Start Date : January 20, 2023                          *
  *                                                                            *
  *                    Last Update :                                           *
  *                                                                            *
  * -------------------------------------------------------------------------- *
  * Over View:                                                                 *
- *   Macros.                                                                  *
+ *   Emm... For debug purpose.                                                *
  * -------------------------------------------------------------------------- *
  * Build Environment:                                                         *
  *   Windows 11 Pro                                                           *
  *   Visual Studio 2022 Community Preview                                     *
  ******************************************************************************/
 
-#ifndef _MACROS_H_
-#define _MACROS_H_
+#include "../../inc/cmd/CommandHeader.h"
 
-#include <memory>
+// order <id>
+bool CheatCommand::Handle(const ArgListPtr args)
+{
+	if (!args || (args->size() > 1))
+	{
+		cnsl::InsertText(ERROR_COLOR, ARGUMENTS_ILLEGAL);
+		cnsl::InsertNewLine();
+		cnsl::InsertText(MESSAGE_COLOR, "Usage: order <order>\n");
+		return false;
+	}
 
-#define DECLARE_CLASS(CLASS) \
-	class CLASS;             \
-	typedef CLASS* CLASS##Ptr;
+	std::string& order = (*args)[0];
+	if (order == "msg")
+	{
+		PRINT_MESSAGE();
+		return true;
+	}
+	else if (order == "err")
+	{
+		PRINT_ERROR();
+		return true;
+	}
+	else if (order == "66")
+	{
+		if (g_passDoc.Save())
+		{
+			cnsl::InsertText(MESSAGE_COLOR, "Password exported in plain text.\n");
+			return true;
+		}
+		else
+		{
+			cnsl::InsertText(ERROR_COLOR, "Failed to export password.\n");
+			return false;
+		}
+	}
+	else if (order == "99")
+	{
+		if (g_passDoc.Load())
+		{
+			cnsl::InsertText(MESSAGE_COLOR, "Plain text password imported.\n");
+			return true;
+		}
+		else
+		{
+			cnsl::InsertText(ERROR_COLOR, "Failed to import password.\n");
+			return false;
+		}
+	}
 
-#define DECLARE_SMART_CLASS(CLASS) \
-	class CLASS;                   \
-	typedef std::shared_ptr<CLASS> CLASS##Ptr;
+	cnsl::InsertText(ERROR_COLOR, "Invalid order.\n");
 
-
-#define BIT(X) (1 << (X))
-
-/*
-**+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-** Debug related.
-**+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-*/
-#if defined(DEBUG) || defined(_DEBUG)
-#define PASH_DEBUG
-#endif
-
-#ifdef PASH_DEBUG
-#include <cassert>
-#endif
-
-#ifdef PASH_DEBUG
-#define PASH_ASSERT(...) assert(__VA_ARGS__)
-#else
-#define PASH_ASSERT(...)
-#endif
-
-// For cheat save.
-#define PASH_CHEAT
-
-// For unit test.
-#define PASH_TEST 0
-
-
-#endif
+	return false;
+}
