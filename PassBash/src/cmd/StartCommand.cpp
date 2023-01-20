@@ -26,6 +26,8 @@
 void StartCommand::OnStart()
 {
 	_InitConsole();
+	cnsl::InsertText(FOREGROUND_LIGHT(FOREGROUND_CYAN),
+		"# Pash Host Version: 1.1.0\n\n");
 }
 
 bool StartCommand::Handle(const ArgListPtr args)
