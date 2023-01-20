@@ -33,8 +33,11 @@
 ** want to bother to wrap them, and Read Alert and CNC did so, too.
 */
 
+extern const int g_PASSWORD_LENGH;
 extern const std::string g_default;
 extern std::string g_password;
+extern char g_encodedPassword[];
+extern char g_decodedPassword[];
 
 extern std::string g_pwd;
 

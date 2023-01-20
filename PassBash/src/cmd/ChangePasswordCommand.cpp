@@ -42,8 +42,6 @@ bool ChangePasswordCommand::Handle(const ArgListPtr args)
 		}
 	}
 
-
-
 	return STATUS();
 }
 

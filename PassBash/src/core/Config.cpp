@@ -9,7 +9,7 @@
  *                                                                            *
  *                     Start Date : January 17, 2023                          *
  *                                                                            *
- *                    Last Update :                                           *
+ *                    Last Update : January 20, 2023                          *
  *                                                                            *
  * -------------------------------------------------------------------------- *
  * Over View:                                                                 *
@@ -47,37 +47,22 @@ bool Config::Load()
 	FILE* input;
 	if (fopen_s(&input, g_CONFIG_FILE, "rb") != 0)
 	{
-		g_password = g_default;
-		if (!Save())
-		{
-			LOG_ERROR("Failed to open file \"%s\"", g_CONFIG_FILE);
-			return false;
-		}
-		else if (fopen_s(&input, g_CONFIG_FILE, "rb") != 0)
-		{
-			LOG_ERROR("Failed to open file \"%s\"", g_CONFIG_FILE);
-			return false;
-		}
+		LOG_ERROR("Failed to open file \"%s\"", g_CONFIG_FILE);
+		return false;
 	}
 
+	size_t size;
 	fseek(input, 0, SEEK_END);
-	char* buffer = new char[ftell(input) + 32];
+	size = ftell(input);
 	fseek(input, 0, SEEK_SET);
+	char buffer[32];
 
 	tea::TEAFileReader* reader = new tea::TEAFileReader(input);
-	tea::TEABufferWriter* writer = new tea::TEABufferWriter(buffer);
-	tea::decode(reader, writer, m_internal);
+	tea::TEABufferWriter* writer = new tea::TEABufferWriter(g_encodedPassword);
+	while (reader->Read(buffer, 8))
+		writer->Write(buffer, 8);
 	delete reader;
 	delete writer;
-
-	g_password = buffer;
-
-	delete[] buffer;
-
-#ifdef PASH_DEBUG
-	LOG_MESSAGE("  Custom password: %s", g_password.c_str());
-	LOG_MESSAGE("Internal password: %s", m_internal);
-#endif
 
 	return true;
 }
@@ -93,7 +78,7 @@ bool Config::Save()
 
 	tea::TEABufferReader* reader = new tea::TEABufferReader(g_password.c_str());
 	tea::TEAFileWriter* writer = new tea::TEAFileWriter(output);
-	tea::encode(reader, writer, m_internal);
+	tea::encode(reader, writer, g_password.c_str());
 	delete reader;
 	delete writer;
 
@@ -103,6 +88,8 @@ bool Config::Save()
 // This will hide the true password - NeWdEsIrEsTuDiOs
 // Or... At least you cannot find it directly from exe file by
 // open it with binary format. :P
+// 2023/01/20 TS: Abandoned this method, use password to encrypt
+// password.
 char* Config::GenerateInternalPassword()
 {
 	m_internal[0]  = 'M' + 1;

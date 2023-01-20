@@ -33,11 +33,10 @@ void HostCommand::OnStart()
 {
 	cnsl::Clear();
 	cnsl::Print();
-	cnsl::InsertText(MESSAGE_COLOR, "Initializing Pash Host...  ");
 	
-	// initializing... ?
-	g_pwd = "./";
-	//
+	/*
+	** 2022/01/20 TS: Commented animation.
+	cnsl::InsertText(MESSAGE_COLOR, "Initializing Pash Host...  ");
 
 	for (int i = 0; i < 20; i++)
 	{
@@ -47,6 +46,7 @@ void HostCommand::OnStart()
 	}
 	cnsl::InsertDelete();
 	cnsl::InsertText(GREETING_COLOR, "\nPash Host fully operational!\n");
+	*/
 	cnsl::InsertText(MESSAGE_COLOR, "User \"help\" for more information.\n\n");
 
 	cnsl::FlushInput();

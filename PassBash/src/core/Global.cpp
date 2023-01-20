@@ -23,10 +23,15 @@
 #include "../../inc/core/Global.h"
 #include "../../inc/core/Config.h"
 
-const std::string g_default { "null" };
-std::string g_password { "null" };
+const int g_PASSWORD_LENGTH = 32;
 
-std::string g_pwd { "." };
+const std::string g_default { "null" };
+std::string g_password { g_default };
+
+char g_decodedPassword[g_PASSWORD_LENGTH];
+char g_encodedPassword[g_PASSWORD_LENGTH];
+
+std::string g_pwd { "./" };
 
 PassDoc g_passDoc{};
 

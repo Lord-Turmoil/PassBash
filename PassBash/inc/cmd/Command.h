@@ -112,6 +112,7 @@ public:
 
 private:
 	bool _ReceivePassword();
+	bool _Validate(const char* key);
 };
 
 // Host for other commands.

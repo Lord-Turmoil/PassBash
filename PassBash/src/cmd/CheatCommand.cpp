@@ -62,6 +62,7 @@ bool CheatCommand::Handle(const ArgListPtr args)
 		if (g_passDoc.Load())
 		{
 			cnsl::InsertText(MESSAGE_COLOR, "Plain text password imported.\n");
+			g_passDoc.Mark();
 			return true;
 		}
 		else

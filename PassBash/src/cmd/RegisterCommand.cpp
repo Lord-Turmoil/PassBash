@@ -74,6 +74,7 @@ void RegisterCommand::_ReceiveNewPassword()
 
 void RegisterCommand::_ReEncryptData()
 {
+	g_config.Save();
 	g_passDoc.Load(g_default.c_str());
 	g_passDoc.Save(g_password.c_str());
 	g_passDoc.UnLoad();

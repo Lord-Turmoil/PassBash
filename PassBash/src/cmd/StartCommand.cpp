@@ -27,16 +27,19 @@ void StartCommand::OnStart()
 {
 	_InitConsole();
 	cnsl::InsertText(FOREGROUND_LIGHT(FOREGROUND_CYAN),
-		"# Pash Host Version: 1.1.0\n\n");
+		"# Pash Host Version: 1.2.0\n\n");
 }
 
 bool StartCommand::Handle(const ArgListPtr args)
 {
 	_InitConfig();
 
+	LOG_CLEAR_ERRORS();
+
 	// First use.
-	if (g_password == g_default)
+	if (g_encodedPassword[0] == '\0')
 	{
+		
 		Scheduler::GetInstance()
 			->AddTask(CommandFactory::SpawnSpecial("Register"), nullptr);
 	}
