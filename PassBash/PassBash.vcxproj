@@ -170,7 +170,6 @@
     <ClCompile Include="src\cmd\LoginCommand.cpp" />
     <ClCompile Include="src\cmd\RegisterCommand.cpp" />
     <ClCompile Include="src\cmd\Scheduler.cpp" />
-    <ClCompile Include="src\cmd\SetPasswordCommand.cpp" />
     <ClCompile Include="src\cmd\StartCommand.cpp" />
     <ClCompile Include="src\cmd\TreeCommand.cpp" />
     <ClCompile Include="src\common\Logger.cpp" />

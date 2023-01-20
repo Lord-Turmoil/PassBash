@@ -138,6 +138,8 @@ bool ListCommand::Handle(const ArgListPtr args)
 		cnsl::InsertText(MESSAGE_COLOR, "Nothing...\n");
 	else
 	{
+		int size = (int)list.size();
+		cnsl::InsertText(MESSAGE_COLOR, "Total %zd groups and items:\n", size);
 		for (auto it : list)
 		{
 			if (IsGroup(it))

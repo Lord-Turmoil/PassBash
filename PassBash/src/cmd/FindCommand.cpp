@@ -68,6 +68,9 @@ bool FindCommand::Handle(const ArgListPtr args)
 		cnsl::InsertText(MESSAGE_COLOR, "Nothing...\n");
 	else
 	{
+		int size = (int)list.size();
+		cnsl::InsertText(MESSAGE_COLOR, "Total %zd %s:\n",
+			size, (size > 1) ? "results" : "result");
 		std::string path;
 		for (auto it : list)
 		{
@@ -126,6 +129,11 @@ void FindCommand::_SearchItem(XMLElementPtr root, XMLElementPtrList& list)
 	while (it)
 	{
 		if (std::regex_match(GetNodeAttr(it, "key"), pattern))
+		{
+			list.push_back(root);
+			return;
+		}
+		else if (std::regex_match(GetNodeAttr(it, "value"), pattern))
 		{
 			list.push_back(root);
 			return;
