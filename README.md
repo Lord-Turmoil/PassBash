@@ -11,6 +11,8 @@ This is an open source project. Check it out on Gitee and Github!
 - [Gitee](https://gitee.com/tonys-studio/pass-bash)
 - [Github](https://github.com/Lord-Turmoil/PassBash) [ Currently unavailable :( ]
 
+You can also take a look at my blog - [PassBash](http://www.tonys-studio.top/2023/01/18/PassBash/). :)
+
 ## What Is It?
 
 PassBash, a.k.a. Pash, is a light-weight command-line password manager, using Tiny Encryption Algorithm to protect your data. And, again, developed with [tinyxml2](http://leethomason.github.io/tinyxml2/).
