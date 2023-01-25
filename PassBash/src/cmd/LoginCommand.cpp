@@ -20,75 +20,12 @@
  *   Visual Studio 2022 Community Preview                                     *
  ******************************************************************************/
 
-#include "../../inc/cmd/CommandHeader.h"
+#include "../../inc/cmd/Service.h"
+#include "../../inc/cmd/FunctionUtil.h"
 
 #include <tea.h>
 
-
-void LoginCommand::OnStart()
-{
-	cnsl::InsertText(GREETING_COLOR, "Welcome back, my friend!\n");
-}
-
-bool LoginCommand::Handle(const ArgListPtr args)
-{
-	if (!_ReceivePassword())
-		return false;
-
-	cnsl::InsertNewLine();
-	cnsl::InsertText(GREETING_COLOR, "Credential confirmed!");
-	Sleep(500);
-
-	if (!HAS_ERROR())
-	{
-		Scheduler::GetInstance()
-			->AddTask(CommandFactory::SpawnSpecial("Host"), nullptr);
-	}
-
-	return STATUS();
-}
-
-bool LoginCommand::_ReceivePassword()
-{
-	char buffer[32];
-	int ret = 0;
-
-	cnsl::InsertText(MESSAGE_COLOR, "Please enter your master password.\n");
-	cnsl::InsertText(PROMPT_COLOR, "$ ");
-	do
-	{
-		ret = cnsl::GetPasswordInterruptable(buffer, 0, 31);
-		if (ret == -1)
-			return false;
-	} while (ret == 0);
-	g_password = buffer;
-	while (!_Validate(g_password.c_str()))
-	{
-		cnsl::InsertNewLine();
-		cnsl::InsertText(ERROR_COLOR, "WRONG PASSWORD!");
-		Sleep(800);
-		cnsl::Clear(0);
-		cnsl::InsertReverseNewLine();
-		cnsl::Clear(0);
-		
-		cnsl::InsertText(PROMPT_COLOR, "$ ");
-		do
-		{
-			ret = cnsl::GetPasswordInterruptable(buffer, 0, 31);
-			if (ret == -1)
-				return false;
-		} while (ret == 0);
-		g_password = buffer;
-	}
-
-	return true;
-}
-
-/********************************************************************
-** 2022/01/20 TS:
-** Something tricky has happened. Here, we have to pass a
-*/
-bool LoginCommand::_Validate(const char* key)
+static bool _validate(const char* key)
 {
 	tea::TEABufferReader* reader = new tea::TEABufferReader(g_encodedPassword);
 	tea::TEABufferWriter* writer = new tea::TEABufferWriter(g_decodedPassword);
@@ -97,4 +34,59 @@ bool LoginCommand::_Validate(const char* key)
 	delete writer;
 
 	return _STR_SAME(key, g_decodedPassword);
+}
+
+static int _receive_password()
+{
+	char buffer[g_PASSWORD_BUFFER_SIZE + 1];
+	int ret = 0;
+
+	cnsl::InsertText(MESSAGE_COLOR, "Please enter your master password.\n");
+	cnsl::InsertText(PROMPT_COLOR, "$ ");
+	do
+	{
+		ret = cnsl::GetPasswordInterruptable(buffer, 0, g_PASSWORD_LENGTH);
+		if (ret == -1)
+			return 1;
+	} while (ret == 0);
+	_format_password(buffer, g_password);
+	while (!_validate(g_password))
+	{
+		cnsl::InsertNewLine();
+		cnsl::InsertText(ERROR_COLOR, "WRONG PASSWORD!");
+		Sleep(800);
+		cnsl::Clear(0);
+		cnsl::InsertReverseNewLine();
+		cnsl::Clear(0);
+
+		cnsl::InsertText(PROMPT_COLOR, "$ ");
+		do
+		{
+			ret = cnsl::GetPasswordInterruptable(buffer, 0, g_PASSWORD_LENGTH);
+			if (ret == -1)
+				return 1;
+		} while (ret == 0);
+		_format_password(buffer, g_password);
+	}
+
+	return 0;
+}
+
+DEC_CMD(login)
+{
+	cnsl::InsertText(GREETING_COLOR, "Welcome back, my friend!\n");
+
+	if (_receive_password() != 0)
+		return 1;
+
+	cnsl::InsertText(GREETING_COLOR, "\nCredential confirmed!\n\n");
+
+	int ret = g_hiddenFactory.execl("host", nullptr);
+	if (ret == -1)
+	{
+		cnsl::InsertText(ERROR_COLOR, "Failed to launch host service!\n");
+		return 2;
+	}
+
+	return 0;
 }

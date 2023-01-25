@@ -23,13 +23,11 @@
 #include "../../inc/core/Global.h"
 #include "../../inc/core/Config.h"
 
-const int g_PASSWORD_LENGTH = 32;
+const char g_default[g_PASSWORD_BUFFER_SIZE] = "null";
+char g_password[g_PASSWORD_BUFFER_SIZE];
 
-const std::string g_default { "null" };
-std::string g_password { g_default };
-
-char g_decodedPassword[g_PASSWORD_LENGTH];
-char g_encodedPassword[g_PASSWORD_LENGTH];
+char g_decodedPassword[g_PASSWORD_BUFFER_SIZE];
+char g_encodedPassword[g_PASSWORD_BUFFER_SIZE];
 
 std::string g_pwd { "./" };
 

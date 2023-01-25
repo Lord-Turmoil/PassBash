@@ -9,7 +9,7 @@
  *                                                                            *
  *                     Start Date : January 16, 2023                          *
  *                                                                            *
- *                    Last Update :                                           *
+ *                    Last Update : January 25, 2023                          *
  *                                                                            *
  * -------------------------------------------------------------------------- *
  * Over View:                                                                 *
@@ -20,39 +20,11 @@
  *   Visual Studio 2022 Community Preview                                     *
  ******************************************************************************/
 
-#include "../../inc/cmd/CommandHeader.h"
+#include "../../inc/cmd/Service.h"
+#include "../../inc/cmd/FunctionUtil.h"
 
 
-void StartCommand::OnStart()
-{
-	_InitConsole();
-	cnsl::InsertText(FOREGROUND_LIGHT(FOREGROUND_CYAN),
-		"# Pash Host Version: 1.2.0\n\n");
-}
-
-bool StartCommand::Handle(const ArgListPtr args)
-{
-	_InitConfig();
-
-	LOG_CLEAR_ERRORS();
-
-	// First use.
-	if (g_encodedPassword[0] == '\0')
-	{
-		
-		Scheduler::GetInstance()
-			->AddTask(CommandFactory::SpawnSpecial("Register"), nullptr);
-	}
-	else
-	{
-		Scheduler::GetInstance()
-			->AddTask(CommandFactory::SpawnSpecial("Login"), nullptr);
-	}
-
-	return !HAS_ERROR();
-}
-
-void StartCommand::_InitConsole()
+static void _start_init_console()
 {
 	cnsl::InitConsoleSize(120, 30);
 	cnsl::InitConsole(116);
@@ -64,7 +36,36 @@ void StartCommand::_InitConsole()
 	cnsl::OverflowReprint(false);
 }
 
-void StartCommand::_InitConfig()
+static int _start_init_config()
 {
-	g_config.Load();
+	if (g_config.Load())
+		return 0;
+	else
+		return 1;
+}
+
+DEC_CMD(start)
+{
+	_start_init_console();
+	cnsl::InsertText(FOREGROUND_LIGHT(FOREGROUND_CYAN),
+		"# Pash Host Version: 2.0.0\n\n");
+
+	_start_init_config();
+
+	int ret;
+	const char* cmd;
+	// First use.
+	if (g_encodedPassword[0] == '\0')
+		cmd = "reg";
+	else
+		cmd = "login";
+
+	ret = g_hiddenFactory.execl(cmd, nullptr);
+	if (ret == -1)
+	{
+		cnsl::InsertText(ERROR_COLOR, "Failed to launch service \"%s\".\n", cmd);
+		return 2;
+	}
+
+	return 0;
 }

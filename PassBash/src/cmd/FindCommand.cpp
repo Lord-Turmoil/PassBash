@@ -20,124 +20,161 @@
  *   Visual Studio 2022 Community Preview                                     *
  ******************************************************************************/
 
-#include "../../inc/cmd/CommandHeader.h"
+#include "../../inc/cmd/FunctionUtil.h"
 
 #include <regex>
 
+static bool is_deep;
+static bool is_strict;
+std::string pattern;
+std::regex reg_pattern;
 
-void FindCommand::OnStart()
+static void _find_init()
 {
-	m_deep = false;
-	m_strict = false;
-	m_pattern = "";
+	is_deep = false;
+	is_strict = false;
+	pattern = "";
 }
 
-bool FindCommand::Handle(const ArgListPtr args)
+static void _find_usage()
 {
-	bool argumentIllegal = false;
-	if (!args)
-		argumentIllegal = true;
-	else
+	cnsl::InsertText(MESSAGE_COLOR, "Usage: find [options] <regular expression>\n");
+	cnsl::InsertText(MESSAGE_COLOR, "  -d -- enable deep search inside password item\n");
+	cnsl::InsertText(MESSAGE_COLOR, "  -s -- enable strict search with regex, no \".*\" added around\n");
+}
+
+static int _find_parse_args(int argc, char* argv[])
+{
+	int opt;
+	bool flag = false;
+	bool err = false;
+	while (opt = getopt(argc, argv, "ds"))
 	{
-		for (auto it = args->begin(); it != args->end(); it++)
+		switch (opt)
 		{
-			if (!m_deep && (*it) == "-d")
-				m_deep = true;
-			if (!m_strict && (*it) == "-s")
-				m_strict = true;
+		case 'd':
+			is_deep = true;
+			break;
+		case 's':
+			is_strict = true;
+			break;
+		case '!':
+			if (flag)
+			{
+				err = true;
+				cnsl::InsertText(ERROR_COLOR, "Too many arguments!\n");
+			}
 			else
-				m_pattern = (*it);
+			{
+				flag = true;
+				pattern = optarg;
+			}
+			break;
+		case '?':
+			err = true;
+			cnsl::InsertText(ERROR_COLOR, "Unknown parameter \"-%c\"\n", optopt);
+			break;
+		default:
+			break;
 		}
 	}
-	if (m_pattern == "")
-		argumentIllegal = true;
-	if (argumentIllegal)
+	if (err)
 	{
 		cnsl::InsertText(ERROR_COLOR, ARGUMENTS_ILLEGAL);
 		cnsl::InsertNewLine();
-		cnsl::InsertText(MESSAGE_COLOR, "Usage: find [options] <regular expression>\n");
-		cnsl::InsertText(MESSAGE_COLOR, "  -d -- enable deep search inside password item\n");
-		cnsl::InsertText(MESSAGE_COLOR, "  -s -- enable strict search with regex, no \".*\" added around\n");
-		return false;
+		return 1;
+	}
+	if (!flag)
+		return 2;
+
+	return 0;
+}
+
+void _search_item(XMLElementPtr root, XMLElementPtrList& list)
+{
+	if (!IsItem(root))
+		return;
+
+	if (std::regex_match(GetNodeName(root), reg_pattern))
+	{
+		list.push_back(root);
+		return;
+	}
+
+	if (!is_deep)
+		return;
+
+	XMLElementPtr it = root->FirstChildElement();
+	while (it)
+	{
+		if (std::regex_match(GetNodeAttr(it, "key"), reg_pattern))
+		{
+			list.push_back(root);
+			return;
+		}
+		else if (std::regex_match(GetNodeAttr(it, "value"), reg_pattern))
+		{
+			list.push_back(root);
+			return;
+		}
+		it = it->NextSiblingElement();
+	}
+}
+
+void _search(XMLElementPtr root, XMLElementPtrList& list)
+{
+	XMLElementPtr it = root->FirstChildElement();
+	while (it)
+	{
+		if (IsGroup(it))
+		{
+			if (std::regex_match(GetNodeName(it), reg_pattern))
+				list.push_back(it);
+			_search(it, list);
+		}
+		else
+			_search_item(it, list);
+
+		it = it->NextSiblingElement();
+	}
+}
+
+static void _find(XMLElementPtrList& list)
+{
+	if (is_strict)
+		reg_pattern.assign(pattern, std::regex::icase);
+	else
+		reg_pattern.assign(".*" + pattern + ".*", std::regex::icase);
+	_search(g_passDoc.GetCurrent(), list);
+}
+
+DEC_CMD(find)
+{
+	_find_init();
+
+	if (_find_parse_args(argc, argv) != 0)
+	{
+		_find_usage();
+		return 1;
 	}
 
 	XMLElementPtrList list;
-	_Find(list);
+	_find(list);
 
 	if (list.empty())
 		cnsl::InsertText(MESSAGE_COLOR, "Nothing...\n");
 	else
 	{
 		int size = (int)list.size();
-		cnsl::InsertText(MESSAGE_COLOR, "Total %zd %s:\n",
+		cnsl::InsertText(MESSAGE_COLOR, "Total %d %s:\n",
 			size, (size > 1) ? "results" : "result");
 		std::string path;
 		for (auto it : list)
 		{
 			cnsl::InsertText(IsGroup(it) ? GROUP_COLOR : ITEM_COLOR,
-				"\t%s\n", GetNodePath(it, path));
+				"\t%s\n", GetNodeDirectory(it, path));
 		}
 	}
 
-	return true;
-}
-
-static std::regex pattern;
-
-void FindCommand::_Find(XMLElementPtrList& list)
-{
-	if (m_strict)
-		pattern.assign(m_pattern, std::regex::icase);
-	else
-		pattern.assign(".*" + m_pattern + ".*", std::regex::icase);
-	_Search(g_passDoc.GetCurrent(), list);
-}
-
-void FindCommand::_Search(XMLElementPtr root, XMLElementPtrList& list)
-{
-	XMLElementPtr it = root->FirstChildElement();
-	while (it)
-	{	
-		if (IsGroup(it))
-		{
-			if (std::regex_match(GetNodeName(it), pattern))
-				list.push_back(it);
-			_Search(it, list);
-		}
-		else
-			_SearchItem(it, list);
-
-		it = it->NextSiblingElement();
-	}
-}
-
-void FindCommand::_SearchItem(XMLElementPtr root, XMLElementPtrList& list)
-{
-	if (!IsItem(root))
-		return;
-
-	if (std::regex_match(GetNodeName(root), pattern))
-	{
-		list.push_back(root);
-		return;
-	}
-
-	if (!m_deep)
-		return;
-
-	XMLElementPtr it = root->FirstChildElement();
-	while (it)
-	{
-		if (std::regex_match(GetNodeAttr(it, "key"), pattern))
-		{
-			list.push_back(root);
-			return;
-		}
-		else if (std::regex_match(GetNodeAttr(it, "value"), pattern))
-		{
-			list.push_back(root);
-			return;
-		}
-		it = it->NextSiblingElement();
-	}
+	return 0;
 }

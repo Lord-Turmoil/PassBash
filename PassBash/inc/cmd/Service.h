@@ -3,32 +3,38 @@
  ******************************************************************************
  *                   Project Name : PassBash                                  *
  *                                                                            *
- *                      File Name : Auxilliary.h                              *
+ *                      File Name : Service.h                                 *
  *                                                                            *
  *                     Programmer : Tony Skywalker                            *
  *                                                                            *
- *                     Start Date : January 15, 2023                          *
+ *                     Start Date : January 25, 2023                          *
  *                                                                            *
  *                    Last Update :                                           *
  *                                                                            *
  * -------------------------------------------------------------------------- *
  * Over View:                                                                 *
- *   Auxilliary functions.                                                    *
+ *   For service commands.                                                    *
  * -------------------------------------------------------------------------- *
  * Build Environment:                                                         *
  *   Windows 11 Pro                                                           *
  *   Visual Studio 2022 Community Preview                                     *
  ******************************************************************************/
 
-#ifndef _AUXILLIARY_H_
-#define _AUXILLIARY_H_
+#include "../common/Macros.h"
 
-#include <cstring>
+#ifndef _SERVICE_H_
+#define _SERVICE_H_
 
-#define _STR_SAME(STR1, STR2) (strcmp(STR1, STR2) == 0)
-#define _STR_DIFF(STR1, STR2) (strcmp(STR1, STR2) != 0)
 
-#define _STR_NSAME(STR1, STR2) (strncmp(STR1, STR2, strlen(STR2)) == 0)
-#define _STR_NDIFF(STR1, STR2) (strncmp(STR1, STR2, strlen(STR2)) != 0)
+/*
+**+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+** Special Commands.
+**+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+*/
+DEC_CMD(start);
+DEC_CMD(reg);
+DEC_CMD(login);
+DEC_CMD(host);
+DEC_CMD(change);
 
 #endif

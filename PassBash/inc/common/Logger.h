@@ -64,8 +64,8 @@ private:
 #define LOG_CLEAR_ERRORS()   Logger::ClearErrors()
 #define LOG_CLEAR_MESSAGES() Logger::ClearMessages()
 
-#define PRINT_ERROR()   Logger::PrintErrors()
-#define PRINT_MESSAGE() Logger::PrintMessages()
+#define LOG_PRINT_ERROR()   Logger::PrintErrors()
+#define LOG_PRINT_MESSAGE() Logger::PrintMessages()
 
 #define HAS_ERROR() (!Logger::Good())
 #define STATUS()    (Logger::Good())

@@ -23,19 +23,14 @@
 #include "../../inc/core/Config.h"
 #include "../../inc/core/Global.h"
 #include "../../inc/common/Logger.h"
-#include "../../inc/utility/Auxilliary.h"
+#include "../../inc/utility/Auxiliary.h"
 
 #include <tea.h>
 
 #include <cstdio>
 
 
-char Config::m_internal[24];
-
-Config::Config()
-{
-	GenerateInternalPassword();
-}
+Config::Config() {}
 
 Config::~Config()
 {
@@ -76,38 +71,11 @@ bool Config::Save()
 		return false;
 	}
 
-	tea::TEABufferReader* reader = new tea::TEABufferReader(g_password.c_str());
+	tea::TEABufferReader* reader = new tea::TEABufferReader(g_password);
 	tea::TEAFileWriter* writer = new tea::TEAFileWriter(output);
-	tea::encode(reader, writer, g_password.c_str());
+	tea::encode(reader, writer, g_password);
 	delete reader;
 	delete writer;
 
 	return true;
-}
-
-// This will hide the true password - NeWdEsIrEsTuDiOs
-// Or... At least you cannot find it directly from exe file by
-// open it with binary format. :P
-// 2023/01/20 TS: Abandoned this method, use password to encrypt
-// password.
-char* Config::GenerateInternalPassword()
-{
-	m_internal[0]  = 'M' + 1;
-	m_internal[1]  = 'd' + 1;
-	m_internal[2]  = 'V' + 1;
-	m_internal[3]  = 'c' + 1;
-	m_internal[4]  = 'D' + 1;
-	m_internal[5]  = 'r' + 1;
-	m_internal[6]  = 'H' + 1;
-	m_internal[7]  = 'q' + 1;
-	m_internal[8]  = 'D' + 1;
-	m_internal[9]  = 'r' + 1;
-	m_internal[10] = 'S' + 1;
-	m_internal[11] = 't' + 1;
-	m_internal[12] = 'C' + 1;
-	m_internal[13] = 'h' + 1;
-	m_internal[14] = 'N' + 1;
-	m_internal[15] = 'r' + 1;
-
-	return m_internal;
 }

@@ -24,19 +24,19 @@
 
 #if !PASH_TEST
 
-#include "../inc/cmd/CommandFactory.h"
-#include "../inc/cmd/Scheduler.h"
+#include "../inc/cmd/Command.h"
+#include "../inc/common/Logger.h"
 
 
 int main()
 {
-	Scheduler::GetInstance()
-		->AddTask(CommandFactory::SpawnSpecial("Start"), nullptr);
-	Scheduler::GetInstance()->Run();
+	init_factory();
+
+	g_hiddenFactory.execl("start", nullptr);
 
 #ifdef PASH_DEBUG
-	PRINT_ERROR();
-	PRINT_MESSAGE();
+	LOG_PRINT_ERROR();
+	LOG_PRINT_MESSAGE();
 #endif
 
 	return 0;

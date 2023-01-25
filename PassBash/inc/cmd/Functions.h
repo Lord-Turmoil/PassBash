@@ -3,54 +3,72 @@
  ******************************************************************************
  *                   Project Name : PassBash                                  *
  *                                                                            *
- *                      File Name : CommandHeader.h                           *
+ *                      File Name : Functions.h                               *
  *                                                                            *
  *                     Programmer : Tony Skywalker                            *
  *                                                                            *
- *                     Start Date : January 17, 2023                          *
+ *                     Start Date : January 16, 2023                          *
  *                                                                            *
  *                    Last Update :                                           *
  *                                                                            *
  * -------------------------------------------------------------------------- *
  * Over View:                                                                 *
- *   Include all headers for all command related cpp.                         *
+ *   Command...                                                               *
  * -------------------------------------------------------------------------- *
  * Build Environment:                                                         *
  *   Windows 11 Pro                                                           *
  *   Visual Studio 2022 Community Preview                                     *
  ******************************************************************************/
 
-#ifndef _COMMAND_HEADER_H_
-#define _COMMAND_HEADER_H_
+#ifndef _FUNCTIONS_H_
+#define _FUNCTIONS_H_
 
-#include "../../inc/cmd/Command.h"
-#include "../../inc/cmd/CommandFactory.h"
-#include "../../inc/cmd/Scheduler.h"
-#include "../../inc/core/Global.h"
-#include "../../inc/core/Config.h"
-#include "../../inc/utility/xml.h"
+#include "../common/Macros.h"
 
-#include <cnsl.h>
+/*
+**+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+** Ordinary Commands
+**+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+*/
+// cd <group name>
+DEC_CMD(cd);
+// ls [group name]
+DEC_CMD(ls);
+// touch <item name>
+DEC_CMD(touch);
+// mkdir <group name>
+DEC_CMD(mkdir);
+// rm <node name>
+DEC_CMD(rm);
+// move <src> <dest>
+DEC_CMD(move);
+// save
+DEC_CMD(save);
+// tree [group name]
+DEC_CMD(tree);
+// cat <item name>
+DEC_CMD(cat);
+// rename <old> <new>
+DEC_CMD(rename);
+// clear
+DEC_CMD(clear);
+// pwd
+DEC_CMD(pwd);
+// help
+DEC_CMD(help);
+// find [-d] [-s] [-r root] <pattern>
+DEC_CMD(find);
+// edit <item name>
+DEC_CMD(edit);
 
-#ifdef max
-#undef max
-#endif
-#ifdef min
-#undef min
-#endif
-
-// Some colors.
-#define PROMPT_COLOR   FOREGROUND_LIGHT(FOREGROUND_BLUE)
-#define GREETING_COLOR FOREGROUND_GREEN
-#define ERROR_COLOR    FOREGROUND_RED
-#define MESSAGE_COLOR  FOREGROUND_YELLOW
-#define GROUP_COLOR    FOREGROUND_CYAN
-#define PWD_COLOR      FOREGROUND_MAGENTA
-#define ITEM_COLOR     FOREGROUND_LIGHT(FOREGROUND_MAGENTA)
-#define ENTRY_MODIFY_COLOR FOREGROUND_LIGHT(FOREGROUND_GREEN)
-#define ENTRY_DELETE_COLOR FOREGROUND_LIGHT(FOREGROUND_RED)
-
-// Some errors.
-#define ARGUMENTS_ILLEGAL "Arguments illegal!"
+/*
+**+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+** Hidden Command
+**+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+*/
+DEC_CMD(unknown);
+DEC_CMD(quit);
+// order
+DEC_CMD(order);
 
 #endif

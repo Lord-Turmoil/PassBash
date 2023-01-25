@@ -9,7 +9,7 @@
  *                                                                            *
  *                     Start Date : January 17, 2023                          *
  *                                                                            *
- *                    Last Update :                                           *
+ *                    Last Update : January 25, 2023                          *
  *                                                                            *
  * -------------------------------------------------------------------------- *
  * Over View:                                                                 *
@@ -20,140 +20,174 @@
  *   Visual Studio 2022 Community Preview                                     *
  ******************************************************************************/
 
-#include "../../inc/cmd/CommandHeader.h"
+#include "../../inc/cmd/Editor.h"
+#include "../../inc/cmd/FunctionUtil.h"
 
 static const char EDIT_IGNORE[] = "|";
 static const int EDIT_KEY_MAX_LENGTH = 30;
 static const int EDIT_VALUE_MAX_LENGTH = 45;
 static const int EDIT_WEIGHT_MAX_LENGTH = 9;
 
-void EditCommand::OnStart()
+/*
+**+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+** edit <item name>
+**+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+*/
+
+static void _edit_usage()
 {
+	cnsl::InsertText(MESSAGE_COLOR, "Usage: mod <item name>\n");
 }
 
-void EditCommand::OnEnd()
+static int _edit_parse_args(int argc, char* argv[], std::string& path)
 {
-	m_item = nullptr;
+	return _parse_args(argc, argv, path);
 }
 
-bool EditCommand::Handle(const ArgListPtr args)
+// The item to edit.
+static XMLElementPtr item;
+static std::string item_path;
+
+DEC_CMD(edit)
 {
-	if (!args || (args->size() != 1))
+	std::string path;
+
+	if (_edit_parse_args(argc, argv, path) != 0)
 	{
-		cnsl::InsertText(ERROR_COLOR, ARGUMENTS_ILLEGAL);
-		cnsl::InsertNewLine();
-		cnsl::InsertText(MESSAGE_COLOR, "Usage: mod <item name>\n");
-		return false;
+		_edit_usage();
+		return 1;
 	}
 
-	const std::string& path = (*args)[0];
-	XMLElementPtr node;
-	if (_STR_SAME(path.c_str(), ROOT_DIR_NAME))
-		node = g_passDoc.GetRoot();
-	else
-		node = GetNodeByPath((*args)[0]);
+	XMLElementPtr node = GetNodeByPath(path);
 	if (!node)
 	{
 		cnsl::InsertText(ERROR_COLOR, "Password item doesn't exist!\n");
-		cnsl::InsertText(MESSAGE_COLOR, "Password item \"%s\" created.\n", path.c_str());
-		std::string name;
-		GetBaseName(path, name);
-		node = CreateItemNodeByPath(path, name.c_str());
+		node = CreateItemNodeByPath(path);
+		cnsl::InsertText(MESSAGE_COLOR, "Password item \"%s\" created.\n",
+			GetNodeDirectory(node, path));
 	}
 	else if (!IsItem(node))
 	{
 		cnsl::InsertText(ERROR_COLOR, "You can only modify a password item!\n");
 		cnsl::InsertText(MESSAGE_COLOR, "Usage: mod <item name>\n");
-		return false;
+		return 2;
 	}
 	
-	m_item = node;
-
-	cnsl::InsertHeaderLine("Edit Mode", '-');
-	cnsl::InsertText(MESSAGE_COLOR, "Use \"help\" for more information.\n");
-	_EditPrompt();
-	cnsl::InsertNewLine();
-	cnsl::InsertHeaderLine("Edit End", '-');
+	item = node;
+	
+	if (g_editorFactory.execl("_edit", nullptr) != 0)
+	{
+		cnsl::InsertText(ERROR_COLOR, "Failed to launch password editor!\n");
+		return 3;
+	}
 
 	g_passDoc.Mark();
 
-	return STATUS();
+	return 0;
 }
 
-char* EditCommand::_SkipLeadingWhiteSpace(char* buffer)
+
+/*
+**+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+** edit host
+**+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+*/
+static char* _edit_strip_white_space(char* buffer)
 {
-	for (char* p = buffer; *p; p++)
+	int length = (int)strlen(buffer);
+	char* begin = buffer;
+	char* end = buffer + length;
+
+	while (begin < end)
 	{
-		if (isprint(*p))
-			return p;
+		if (isspace(*begin))
+			begin++;
+		else
+			break;
 	}
+	if (begin == end)	// all is space
+		return nullptr;
+	
+	while (begin < --end)
+	{
+		if (isspace(*end))
+			end--;
+		else
+			break;
+	}
+	*(end + 1) = '\0';
 
-	return nullptr;
+	return begin;
 }
 
-void EditCommand::_ParseType(const char* cmd, char* type)
-{
-	for (const char* p = cmd; *p && (*p != ' '); p++)
-		*(type++) = *p;
-	*type = '\0';
-}
-
-char* EditCommand::_ParseCommand(char* cmd)
+static void _edit_parse_cmd(char* cmd, char*& type, char*& arg)
 {
 	char* p = cmd;
-	while (*p && (*p != ' '))
+	while (*p && isspace(*p))
 		p++;
-	while (*p && (*p == ' '))
+	type = p;
+	while (*p && !isspace(*p))
 		p++;
 
-	return p;
+	while (*p && isspace(*p))
+		*(p++) = '\0';
+	arg = p;
+	
+	p = cmd + strlen(cmd) - 1;
+	while (p > arg && isspace(*p))
+		p--;
+	*(p + 1) = '\0';
 }
 
-
-void EditCommand::_EditPrompt()
+static void _edit_print_prompt()
 {
-	char buffer[128];
-	char type[128];
+	cnsl::InsertText("[Edit Mode]");
+	cnsl::InsertText(PWD_COLOR, "%s", item_path.c_str());
+	cnsl::InsertText(PROMPT_COLOR, "> ");
+}
+
+DEC_CMD(_edit)
+{
+	// begin
+	cnsl::InsertHeaderLine("Password Editor 1.1.0", '-');
+	cnsl::InsertText(MESSAGE_COLOR, "Use \"help\" for more information.\n");
+
+	// main loop
+	char buffer[CMD_BUFFER_SIZE + 1];
 	int ret;
-	
-	cnsl::InsertText(PROMPT_COLOR, " %s> ", GetNodeName(m_item));
-	while ((ret = cnsl::GetStringInterruptible(buffer, 0, 127)) != -1)
+	GetNodeDirectory(item, item_path);
+
+	_edit_print_prompt();
+	while ((ret = cnsl::GetStringInterruptible(buffer, 0, CMD_BUFFER_SIZE)) != -1)
 	{
 		cnsl::InsertNewLine();
 		if (ret > 0)
 		{
-			char* cmd = _SkipLeadingWhiteSpace(buffer);
-			_ParseType(cmd, type);
-			cmd = _ParseCommand(cmd);
-			if (_STR_NSAME(type, "h") || _STR_NSAME(type, "help"))
-				_Help();
-			else if (_STR_SAME(type, "c") || _STR_SAME(type, "clear"))
-				_Clear();
-			else if (_STR_SAME(type, "s") || _STR_SAME(type, "see"))
-				_See();
-			else if (_STR_SAME(type, "st") || _STR_SAME(type, "set"))
-				_SetPrompt(cmd);
-			else if (_STR_SAME(type, "sk") || _STR_SAME(type, "setk"))
-				_SetKeyPrompt(cmd);
-			else if (_STR_SAME(type, "sv") || _STR_SAME(type, "setv"))
-				_SetValuePrompt(cmd);
-			else if (_STR_SAME(type, "sw") || _STR_SAME(type, "setw"))
-				_SetWeightPrompt(cmd);
-			else if (_STR_SAME(type, "usd") || (_STR_SAME(type, "ustid")))
-				_UnSetIDPrompt(cmd);
-			else if (_STR_SAME(type, "ust") || _STR_SAME(type, "unset"))
-				_UnSetPrompt(cmd);
-			else if (_STR_SAME(type, "quit") || _STR_SAME(type, "q"))
+			char* cmd = _edit_strip_white_space(buffer);
+			char* type;
+			char* arg;
+			_edit_parse_cmd(cmd, type, arg);
+
+			int ret = g_editorFactory.execl(type, type, arg, nullptr);
+			if (ret == -1)
+				g_editorFactory.execl("unknown", "unknown", type, nullptr);
+			else if (ret == 66)
 				break;
-			else
-				_UnRecognized(type);
+			else if (ret != 0)
+				LOG_ERROR("Editor \"%s\" -- Error Code: %d", type, ret);
 		}
-			
-		cnsl::InsertText(PROMPT_COLOR, " %s> ", GetNodeName(m_item));
+		_edit_print_prompt();
 	}
+
+	//end
+	cnsl::InsertNewLine();
+	cnsl::InsertHeaderLine("Edit End", '-');
+
+	return 0;
 }
 
-void EditCommand::_Help()
+// help
+DEC_CMD(_edit_help)
 {
 	WORD old = cnsl::SetTextForeground(MESSAGE_COLOR);
 
@@ -161,241 +195,171 @@ void EditCommand::_Help()
 	cnsl::InsertNewLine();
 	cnsl::InsertText(" Tips: There shall not be extra space around '|'\n\n");
 	cnsl::InsertText("         help, h -- show help\n\n");
-	cnsl::InsertText("        clear, c -- clear screen\n\n");
+	cnsl::InsertText("   clear, cls, c -- clear screen\n\n");
 	cnsl::InsertText("          see, s -- show current password item\n\n");
 	cnsl::InsertText("         set, st -- create or overwrite entry\n");
 	cnsl::InsertText("                    usage: set key|value[|weight=auto]\n\n");
 	cnsl::InsertText("        setk, sk -- reset key field, old-key must exist\n");
-	cnsl::InsertText("                    usage: setk old-key|new-key\n\n");
+	cnsl::InsertText("                    usage: setk id|new-key\n\n");
 	cnsl::InsertText("        setv, sv -- reset value field, key must exist\n");
-	cnsl::InsertText("                    usage: setv key|value\n\n");
+	cnsl::InsertText("                    usage: setv id|value\n\n");
 	cnsl::InsertText("        setw, sw -- reset weight field, key must exist\n");
-	cnsl::InsertText("                    usage: setw key|weight\n\n");
+	cnsl::InsertText("                    usage: setw id|weight\n\n");
 	cnsl::InsertText("      unset, ust -- delete entry, key must exist\n");
-	cnsl::InsertText("                    usage: unset key\n\n");
-	cnsl::InsertText("      ustid, usd -- delete entry by id, id must exist\n");
-	cnsl::InsertText("                    usage: ustid id\n\n");
+	cnsl::InsertText("                    usage: unset id\n\n");
 	cnsl::InsertText("  quit, q, <ESC> -- quit edit mode\n");
 	cnsl::InsertSplitLine('_');
 	cnsl::InsertNewLine();
 
 	cnsl::SetTextForeground(old);
+
+	return 0;
 }
 
-void EditCommand::_Clear()
+
+/*
+**+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+** clear
+**+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+*/
+DEC_CMD(_edit_clear)
 {
 	cnsl::Clear();
-	// cnsl::Print();
+
+	return 0;
 }
 
-void EditCommand::_See()
+/*
+**+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+** see
+**+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+*/
+DEC_CMD(_edit_see)
 {
-	_See(nullptr, 0);
+	_show_item(item, nullptr);
+	
+	return 0;
 }
 
-void EditCommand::_See(const char* key, WORD color)
+
+/*
+**+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+** Utils
+**+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+*/
+static int _set_key(const char* idStr, const char* newKey)
 {
-	EntryList list;
-
-	if (!GetEntries(m_item, list))
+	int id;
+	if (!tinyxml2::XMLUtil::ToInt(idStr, &id))
 	{
-		cnsl::InsertText(ERROR_COLOR, "I... I can't see it!\n");
-		return;
+		cnsl::InsertText(ERROR_COLOR, "Invalid id format!\n");
+		return 1;
 	}
 
-	if (list.empty())
-		cnsl::InsertHeaderLine("Nothing", ' ');
-	else
-	{
-		int total = 100;
-		int maxKey = 0;
-		int maxValue = 0;
-		int maxWeight = 0;
-		for (auto& it : list)
-		{
-			maxKey = std::max(maxKey, (int)strlen(it.key));
-			maxValue = std::max(maxValue, (int)strlen(it.value));
-		}
-		maxKey = std::max(maxKey, 20);
-		maxValue = std::max(maxValue, 20);
-		maxWeight = std::min(total - maxKey - maxValue, 12);
-		cnsl::InsertText(MESSAGE_COLOR, "%4s | %*s | %*s | %*s\n",
-			"ID",
-			maxKey, "Key",
-			maxValue, "Value",
-			maxWeight, "Weight");
-		int id = 0;
-		for (auto& it : list)
-		{
-			if (key && _STR_SAME(it.key, key))
-			{
-				cnsl::InsertText(color, "%4d | %*s | %*s | %*d\n", id++,
-					maxKey, it.key, maxValue, it.value, maxWeight, it.weight);
-			}
-			else
-			{
-				cnsl::InsertText("%4d | %*s | %*s | %*d\n", id++,
-					maxKey, it.key, maxValue, it.value, maxWeight, it.weight);
-			}
-		}
-	}
-}
-
-// cmd[set key:value:weight]
-void EditCommand::_SetPrompt(char* cmd)
-{
-	char* context = nullptr;
-	char* token = strtok_s(cmd, EDIT_IGNORE, &context);
-	const char* args[3]{ nullptr, nullptr, "-1" };
-	int pos;
-	for (pos = 0; pos < 3; pos++)
-	{
-		if (token)
-		{
-			args[pos] = token;
-			token = strtok_s(nullptr, EDIT_IGNORE, &context);
-		}
-		else
-			break;
-	}
-	if (pos < 2)
-	{
-		// Arguments illegal!
-		cnsl::InsertText(ERROR_COLOR, "Usage: set key|value[|weight=auto]\n");
-		return;
-	}
-
-	_SetEntry(args[0], args[1], args[2]);
-}
-
-// setk old-key:new-key
-void EditCommand::_SetKeyPrompt(char* cmd)
-{
-	char* context = nullptr;
-	char* token = strtok_s(cmd, EDIT_IGNORE, &context);
-	const char* args[2]{ nullptr, nullptr };
-	int pos;
-	for (pos = 0; pos < 2; pos++)
-	{
-		if (token)
-		{
-			args[pos] = token;
-			token = strtok_s(nullptr, EDIT_IGNORE, &context);
-		}
-		else
-			break;
-	}
-	if (pos != 2)
-	{
-		// Arguments illegal!
-		cnsl::InsertText(ERROR_COLOR, "Usage: setk old-key|new-key\n");
-		return;
-	}
-
-	_SetKey(args[0], args[1]);
-}
-
-// setv key:value
-void EditCommand::_SetValuePrompt(char* cmd)
-{
-	char* context = nullptr;
-	char* token = strtok_s(cmd, EDIT_IGNORE, &context);
-	const char* args[2]{ nullptr, nullptr };
-	int pos;
-	for (pos = 0; pos < 2; pos++)
-	{
-		if (token)
-		{
-			args[pos] = token;
-			token = strtok_s(nullptr, EDIT_IGNORE, &context);
-		}
-		else
-			break;
-	}
-	if (pos != 2)
-	{
-		// Arguments illegal!
-		cnsl::InsertText(ERROR_COLOR, "Usage: set key|value\n");
-		return;
-	}
-
-	_SetEntry(args[0], args[1], nullptr);
-}
-
-// setw key:weight
-void EditCommand::_SetWeightPrompt(char* cmd)
-{
-	char* context = nullptr;
-	char* token = strtok_s(cmd, EDIT_IGNORE, &context);
-	const char* args[2]{ nullptr, nullptr };
-	int pos;
-	for (pos = 0; pos < 2; pos++)
-	{
-		if (token)
-		{
-			args[pos] = token;
-			token = strtok_s(nullptr, EDIT_IGNORE, &context);
-		}
-		else
-			break;
-	}
-	if (pos != 2)
-	{
-		// Arguments illegal!
-		cnsl::InsertText(ERROR_COLOR, "Usage: set key|weight\n");
-		return;
-	}
-
-	_SetEntry(args[0], nullptr, args[1]);
-}
-
-bool EditCommand::_SetKey(const char* oldKey, const char* newKey)
-{
-	XMLElementPtr entry = GetEntryNode(m_item, oldKey);
+	XMLElementPtr entry = GetEntryNode(item, id);
 	if (!entry)
 	{
-		cnsl::InsertText(ERROR_COLOR, "Entry with key \"%s\" doesn't exists!\n", oldKey);
-		return false;
+		cnsl::InsertText(ERROR_COLOR, "Entry with ID \"%d\" doesn't exist!\n", id);
+		return 2;
 	}
 
-	if (oldKey && (strlen(oldKey) > EDIT_KEY_MAX_LENGTH))
+	if (strlen(newKey) > EDIT_KEY_MAX_LENGTH)
 	{
 		cnsl::InsertText(ERROR_COLOR,
-			"Old key is too long! No longer than %d characters!\n",
+			"New key is too long! No longer than %d characters!\n",
 			EDIT_KEY_MAX_LENGTH);
-		return false;
+		return 3;
 	}
-	if (newKey)
-	{
-		if (strlen(newKey) > 30)
-		{
-			cnsl::InsertText(ERROR_COLOR,
-				"New key is too long! No longer than %d characters!\n",
-				EDIT_KEY_MAX_LENGTH);
-			return false;
-		}
-		entry->SetAttribute("key", newKey);
-	}
+	entry->SetAttribute("key", newKey);
 
-	_See(newKey, ENTRY_MODIFY_COLOR);
+	_show_item(item, newKey, ENTRY_MODIFY_COLOR);
 
-	return true;
+	return 0;
 }
 
-bool EditCommand::_SetEntry(const char* key, const char* value, const char* weightStr)
+static int _set_value(const char* idStr, const char* value)
+{
+	int id;
+	if (!tinyxml2::XMLUtil::ToInt(idStr, &id))
+	{
+		cnsl::InsertText(ERROR_COLOR, "Invalid id format!\n");
+		return 1;
+	}
+
+	XMLElementPtr entry = GetEntryNode(item, id);
+	if (!entry)
+	{
+		cnsl::InsertText(ERROR_COLOR, "Entry with ID \"%d\" doesn't exist!\n", id);
+		return 2;
+	}
+
+	if (strlen(value) > EDIT_VALUE_MAX_LENGTH)
+	{
+		cnsl::InsertText(ERROR_COLOR,
+			"Value is too long! No longer than %d characters!\n",
+			EDIT_VALUE_MAX_LENGTH);
+		return 3;
+	}
+	entry->SetAttribute("value", value);
+
+	_show_item(item, entry->Attribute("key"), ENTRY_MODIFY_COLOR);
+
+	return 0;
+}
+
+static int _set_weight(const char* idStr, const char* weightStr)
+{
+	int id;
+	if (!tinyxml2::XMLUtil::ToInt(idStr, &id))
+	{
+		cnsl::InsertText(ERROR_COLOR, "Invalid id format!\n");
+		return 1;
+	}
+	
+	if (strlen(weightStr) > EDIT_WEIGHT_MAX_LENGTH)
+	{
+		cnsl::InsertText(ERROR_COLOR,
+			"Weight is too long! No longer than %d characters!\n",
+			EDIT_VALUE_MAX_LENGTH);
+		return 2;
+	}
+	int weight;
+	if (!tinyxml2::XMLUtil::ToInt(weightStr, &weight))
+	{
+		cnsl::InsertText(ERROR_COLOR, "Invalid weight format!\n");
+		return 3;
+	}
+
+	XMLElementPtr entry = GetEntryNode(item, id);
+	if (!entry)
+	{
+		cnsl::InsertText(ERROR_COLOR, "Entry with ID \"%d\" doesn't exist!\n", id);
+		return 4;
+	}
+	entry->SetAttribute("weight", weight);
+
+	_show_item(item, entry->Attribute("key"), ENTRY_MODIFY_COLOR);
+
+	return 0;
+}
+
+static int _set_entry(const char* key, const char* value, const char* weightStr)
 {
 	if (!key)
-		return false;
+	{
+		cnsl::InsertText(ERROR_COLOR, "Missing entry key!\n");
+		return 1;
+	}
 
 	XMLElementPtr entry;
 	if (key && value && weightStr)	// can create
-		entry = GetOrCreateEntryNode(m_item, key);
+		entry = GetOrCreateEntryNode(item, key);
 	else
-		entry = GetEntryNode(m_item, key);
+		entry = GetEntryNode(item, key);
 	if (!entry)
 	{
-		cnsl::InsertText(ERROR_COLOR, "Entry with key \"%s\" doesn't exists!\n", key);
-		return false;
+		cnsl::InsertText(ERROR_COLOR, "Entry with key \"%s\" doesn't exist!\n", key);
+		return 2;
 	}
 
 	if (key && (strlen(key) > EDIT_KEY_MAX_LENGTH))
@@ -403,7 +367,7 @@ bool EditCommand::_SetEntry(const char* key, const char* value, const char* weig
 		cnsl::InsertText(ERROR_COLOR,
 			"Key is too long! No longer than %d characters!\n",
 			EDIT_KEY_MAX_LENGTH);
-		return false;
+		return 3;
 	}
 	if (value)
 	{
@@ -412,7 +376,7 @@ bool EditCommand::_SetEntry(const char* key, const char* value, const char* weig
 			cnsl::InsertText(ERROR_COLOR,
 				"Value is too long! No longer than %d characters!\n",
 				EDIT_VALUE_MAX_LENGTH);
-			return false;
+			return 4;
 		}
 		entry->SetAttribute("value", value);
 	}
@@ -423,84 +387,186 @@ bool EditCommand::_SetEntry(const char* key, const char* value, const char* weig
 			cnsl::InsertText(ERROR_COLOR,
 				"Key is too long! No longer than %d characters!\n",
 				EDIT_WEIGHT_MAX_LENGTH);
-			return false;
+			return 5;
 		}
-		int weight = 0;
+		int weight = -1;
 		int w;
 		if (tinyxml2::XMLUtil::ToInt(weightStr, &w))
 			weight = w;
 		if (weight == -1)	// auto
 		{
 			EntryList list;
-			GetEntries(m_item, list);
-			weight = list.back().weight + 4;
+			GetEntries(item, list);
+			if (list.empty())
+				weight = 4;
+			else
+				weight = list.back().weight + 4;
 		}
 		entry->SetAttribute("weight", weight);
 	}
 
-	_See(key, ENTRY_MODIFY_COLOR);
+	_show_item(item, key, ENTRY_MODIFY_COLOR);
 
-	return true;
+	return 0;
 }
 
-void EditCommand::_UnSetIDPrompt(char* cmd)
+
+/*
+**+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+** set
+**+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+*/
+static int _edit_parse_params(char* arg, int argc, const char* params[])
 {
+	if (arg == nullptr)
+		return 0;
+
 	char* context = nullptr;
-	char* token = strtok_s(cmd, EDIT_IGNORE, &context);
-	if (!token)
+	char* token = strtok_s(arg, EDIT_IGNORE, &context);
+	int cnt = 0;
+	while (token)
 	{
-		// Arguments illegal!
-		cnsl::InsertText(ERROR_COLOR, "Usage: ustid id\n");
-		return;
+		cnt++;
+		if (cnt <= argc)
+			params[cnt - 1] = token;
+		token = strtok_s(nullptr, EDIT_IGNORE, &context);
+	}
+	
+	return cnt;
+}
+
+// set key|value|weight
+static void _set_usage()
+{
+	cnsl::InsertText(ERROR_COLOR, "Usage: set key|value[|weight=auto]\n");
+}
+
+DEC_CMD(_edit_set)
+{
+	const char* params[3] = { nullptr, nullptr, "-1" };
+	int ret = _edit_parse_params(argv[1], 3, params);
+
+	if (ret < 2 || ret > 3)
+	{
+		_set_usage();
+		return 1;
+	}
+
+	return _set_entry(params[0], params[1], params[2]);
+}
+
+
+// setk id|newKey
+static void _setk_usage()
+{
+	cnsl::InsertText(ERROR_COLOR, "Usage: setk id|new-key\n");
+}
+
+DEC_CMD(_edit_setk)
+{
+	const char* params[2] = { nullptr, nullptr };
+	int ret = _edit_parse_params(argv[1], 2, params);
+
+	if (ret != 2)
+	{
+		_setk_usage();
+		return 1;
+	}
+
+	return _set_key(params[0], params[1]);
+}
+
+
+// setv id|value
+static void _setv_usage()
+{
+	cnsl::InsertText(ERROR_COLOR, "Usage: setv id|value\n");
+}
+
+DEC_CMD(_edit_setv)
+{
+	const char* params[2] = { nullptr, nullptr };
+	int ret = _edit_parse_params(argv[1], 2, params);
+
+	if (ret != 2)
+	{
+		_setv_usage();
+		return 1;
+	}
+
+	return _set_value(params[0], params[1]);
+}
+
+
+// setw id|weight
+static void _setw_usage()
+{
+	cnsl::InsertText(ERROR_COLOR, "Usage: setw key|weight\n");
+}
+
+DEC_CMD(_edit_setw)
+{
+	const char* params[2] = { nullptr, nullptr };
+	int ret = _edit_parse_params(argv[1], 2, params);
+
+	if (ret != 2)
+	{
+		_setw_usage();
+		return 1;
+	}
+
+	return _set_weight(params[0], params[1]);
+}
+
+// unset id
+static void _unset_usage()
+{
+	cnsl::InsertText(ERROR_COLOR, "Usage: ustid id\n");
+}
+
+DEC_CMD(_edit_unset)
+{
+	const char* params[1] = { nullptr };
+	int ret = _edit_parse_params(argv[1], 1, params);
+
+	if (ret != 1)
+	{
+		_unset_usage();
+		return 1;
 	}
 
 	int id;
-	bool flag = false;
-	EntryList list;
-	if (tinyxml2::XMLUtil::ToInt(token, &id))
+	if (!tinyxml2::XMLUtil::ToInt(params[0], &id))
 	{
-		if (id >= 0)
-		{
-			GetEntries(m_item, list);
-			if (id < list.size())
-				flag = true;
-		}
+		cnsl::InsertText("Invalid ID format!\n");
+		return 2;
 	}
-
-	if (flag)
-		_UnSet(list[id].key);
-	else
-		cnsl::InsertText(ERROR_COLOR, "Invalid ID! Use see to check all available IDs.\n");
-}
-
-void EditCommand::_UnSetPrompt(char* cmd)
-{
-	char* context = nullptr;
-	char* token = strtok_s(cmd, EDIT_IGNORE, &context);
-	if (!token)
-	{
-		// Arguments illegal!
-		cnsl::InsertText(ERROR_COLOR, "Usage: unset key\n");
-		return;
-	}
-
-	_UnSet(token);
-}
-
-void EditCommand::_UnSet(const char* key)
-{
-	XMLElementPtr entry = GetEntryNode(m_item, key);
+	XMLElementPtr entry = GetEntryNode(item, id);
 	if (!entry)
-		cnsl::InsertText(ERROR_COLOR, "Entry with key \"%s\" doesn't exists!\n", key);
-	else
 	{
-		_See(key, ENTRY_DELETE_COLOR);
-		DeleteNode(entry);
+		cnsl::InsertText(ERROR_COLOR, "Entry with ID \"%d\" doesn't exist!\n", id);
+		return 3;
 	}
+
+	_show_item(item, entry->Attribute("key"), ENTRY_DELETE_COLOR);
+	DeleteNode(entry);
+
+	return 0;
 }
 
-void EditCommand::_UnRecognized(const char* cmd)
+
+// missing
+DEC_CMD(_edit_unknown)
 {
-	cnsl::InsertText(ERROR_COLOR, "\"%s\" is not an edit command.\n", cmd);
+	cnsl::InsertText(ERROR_COLOR, "\"%s\" is not an edit command.\n", argv[1]);
 	cnsl::InsertText(MESSAGE_COLOR, "Use \"help\" for more information.\n");
+	
+	return 0;
+}
+
+
+// quit
+DEC_CMD(_edit_quit)
+{
+	return 66;
 }

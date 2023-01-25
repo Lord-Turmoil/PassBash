@@ -9,7 +9,7 @@
  *                                                                            *
  *                     Start Date : January 20, 2023                          *
  *                                                                            *
- *                    Last Update :                                           *
+ *                    Last Update : January 25, 2023                          *
  *                                                                            *
  * -------------------------------------------------------------------------- *
  * Over View:                                                                 *
@@ -20,41 +20,46 @@
  *   Visual Studio 2022 Community Preview                                     *
  ******************************************************************************/
 
-#include "../../inc/cmd/CommandHeader.h"
+#include "../../inc/cmd/FunctionUtil.h"
+
 
 // order <id>
-bool CheatCommand::Handle(const ArgListPtr args)
+static void _order_usage()
 {
-	if (!args || (args->size() > 1))
+	cnsl::InsertText(MESSAGE_COLOR, "Usage: order <order>\n");
+}
+
+static int _order_parse_args(int argc, char* argv[], std::string& order)
+{
+	return _parse_args(argc, argv, order);
+}
+
+DEC_CMD(order)
+{
+	std::string order;
+
+	if (_order_parse_args(argc, argv, order) != 0)
 	{
-		cnsl::InsertText(ERROR_COLOR, ARGUMENTS_ILLEGAL);
-		cnsl::InsertNewLine();
-		cnsl::InsertText(MESSAGE_COLOR, "Usage: order <order>\n");
-		return false;
+		_order_usage();
+		return 1;
 	}
 
-	std::string& order = (*args)[0];
 	if (order == "msg")
-	{
-		PRINT_MESSAGE();
-		return true;
-	}
+		LOG_PRINT_MESSAGE();
+	else if (order == "cmsg")
+		LOG_CLEAR_MESSAGES();
 	else if (order == "err")
-	{
-		PRINT_ERROR();
-		return true;
-	}
+		LOG_PRINT_ERROR();
+	else if (order == "cerr")
+		LOG_CLEAR_ERRORS();
 	else if (order == "66")
 	{
 		if (g_passDoc.Save())
-		{
 			cnsl::InsertText(MESSAGE_COLOR, "Password exported in plain text.\n");
-			return true;
-		}
 		else
 		{
 			cnsl::InsertText(ERROR_COLOR, "Failed to export password.\n");
-			return false;
+			return 2;
 		}
 	}
 	else if (order == "99")
@@ -63,16 +68,18 @@ bool CheatCommand::Handle(const ArgListPtr args)
 		{
 			cnsl::InsertText(MESSAGE_COLOR, "Plain text password imported.\n");
 			g_passDoc.Mark();
-			return true;
 		}
 		else
 		{
 			cnsl::InsertText(ERROR_COLOR, "Failed to import password.\n");
-			return false;
+			return 3;
 		}
 	}
+	else
+	{
+		cnsl::InsertText(ERROR_COLOR, "Invalid order.\n");
+		return 4;
+	}
 
-	cnsl::InsertText(ERROR_COLOR, "Invalid order.\n");
-
-	return false;
+	return 0;
 }

@@ -23,7 +23,6 @@
 #include "../../inc/core/PassDoc.h"
 #include "../../inc/core/Global.h"
 #include "../../inc/common/Logger.h"
-#include "../../inc/utility/Auxilliary.h"
 
 #include <tea.h>
 #include <algorithm>
@@ -35,7 +34,7 @@ PassDoc::PassDoc() : m_root(nullptr), m_current(nullptr), m_modified(false) {}
 PassDoc::~PassDoc()
 {
 	if (m_modified)
-		Save(g_password.c_str());
+		Save(g_password);
 }
 
 bool PassDoc::Load(const char* password)
@@ -177,33 +176,6 @@ void PassDoc::DeleteElement(XMLElementPtr node)
 	m_file.Doc().DeleteNode(node);
 }
 
-void PassDoc::GetPresentWorkingDirectory(std::string& path)
-{
-	GetWorkingDirectory(m_current, path);
-}
-
-void PassDoc::GetWorkingDirectory(XMLElementPtr node, std::string& path)
-{
-	std::stack<XMLElementPtr> chain;
-	
-	while (node != m_root)
-	{
-		chain.push(node);
-		node = GetParentNode(node);
-	}
-	chain.push(node);
-
-	path = "";
-	while (!chain.empty())
-	{
-		node = chain.top();
-		chain.pop();
-		path += GetNodeName(node);
-		if (IsGroup(node))
-			path += '/';
-	}
-}
-
 void PassDoc::Mark()
 {
 	m_modified = true;
@@ -220,7 +192,7 @@ bool PassDoc::_GenerateData()
 
 	tea::TEABufferReader* reader = new tea::TEABufferReader(g_DEFAULT_DATA);
 	tea::TEAFileWriter* writer = new tea::TEAFileWriter(output);
-	tea::encode(reader, writer, g_default.c_str());
+	tea::encode(reader, writer, g_default);
 	delete reader;
 	delete writer;
 
@@ -250,11 +222,36 @@ XMLElementPtr AddChildNode(XMLElementPtr node, XMLElementPtr child)
 	return child;
 }
 
-const char* GetNodePath(XMLElementPtr node, std::string& path)
+const char* GetNodeDirectory(XMLElementPtr node, std::string& path)
 {
-	g_passDoc.GetWorkingDirectory(node, path);
+	XMLElementPtr root = g_passDoc.GetRoot();
+	std::stack<XMLElementPtr> chain;
+
+	while (node != root)
+	{
+		chain.push(node);
+		node = GetParentNode(node);
+	}
+	chain.push(node);
+
+	path = "";
+	while (!chain.empty())
+	{
+		node = chain.top();
+		chain.pop();
+		path += GetNodeName(node);
+		if (IsGroup(node))
+			path += '/';
+	}
+
 	return path.c_str();
 }
+
+const char* GetPresentWorkingDirectory(std::string& path)
+{
+	return GetNodeDirectory(g_passDoc.GetCurrent(), path);
+}
+
 
 
 /*
@@ -421,6 +418,24 @@ void DeleteChildren(XMLElementPtr node)
 	node->DeleteChildren();
 }
 
+bool IsParent(XMLElementPtr parent, XMLElementPtr child)
+{
+	XMLElementPtr root = g_passDoc.GetRoot();
+
+	if (parent == root)
+		return child != root;
+
+	// parent is not root now
+	while (child != root)
+	{
+		child = GetParentNode(child);
+		if (parent == child)
+			return true;
+	}
+
+	return false;
+}
+
 
 /*
 **+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -469,8 +484,14 @@ XMLElementPtr CreateGroupNodeByPath(const std::string& path)
 **+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 */
 // This must create a new node! Use GetNodeByPath to check!
-XMLElementPtr CreateItemNodeByPath(const std::string& path, const char* name)
+XMLElementPtr CreateItemNodeByPath(const std::string& path)
 {
+	std::string name;
+
+	GetBaseName(path, name);
+	if (name == "")	// illegal name.
+		return nullptr;
+
 	char* buffer = _strdup(path.c_str());
 	char* context = nullptr;
 
@@ -504,7 +525,7 @@ XMLElementPtr CreateItemNodeByPath(const std::string& path, const char* name)
 	if (node)
 	{
 		node->SetName(ITEM_TAG);
-		node->SetAttribute("name", name);
+		node->SetAttribute("name", name.c_str());
 	}
 
 	return node;
@@ -593,6 +614,21 @@ XMLElementPtr GetEntryNode(XMLElementPtr node, const char* key)
 	}
 
 	return p;
+}
+
+XMLElementPtr GetEntryNode(XMLElementPtr node, int id)
+{
+	if (!IsItem(node))
+		return nullptr;
+	if (id < 0)
+		return nullptr;
+
+	EntryList list;
+	GetEntries(node, list);
+	if (id < list.size())
+		return GetEntryNode(node, list[id].key);
+	else
+		return nullptr;
 }
 
 XMLElementPtr GetOrCreateEntryNode(XMLElementPtr node, const char* key)

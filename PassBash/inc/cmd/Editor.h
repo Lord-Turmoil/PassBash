@@ -3,56 +3,42 @@
  ******************************************************************************
  *                   Project Name : PassBash                                  *
  *                                                                            *
- *                      File Name : Sheduler.h                                *
+ *                      File Name : Editor.h                                  *
  *                                                                            *
  *                     Programmer : Tony Skywalker                            *
  *                                                                            *
- *                     Start Date : January 16, 2023                          *
+ *                     Start Date : January 25, 2023                          *
  *                                                                            *
  *                    Last Update :                                           *
  *                                                                            *
  * -------------------------------------------------------------------------- *
  * Over View:                                                                 *
- *   Command shedualer.                                                       *
+ *   For editor.                                                              *
  * -------------------------------------------------------------------------- *
  * Build Environment:                                                         *
  *   Windows 11 Pro                                                           *
  *   Visual Studio 2022 Community Preview                                     *
  ******************************************************************************/
 
-#ifndef _SHEDULER_H_
-#define _SHEDULER_H_
+#include "../common/Macros.h"
 
-#include "Command.h"
+// edit host
+DEC_CMD(_edit);
 
-#include <queue>
+// clear
+DEC_CMD(_edit_clear);
+// help
+DEC_CMD(_edit_help);
+// see
+DEC_CMD(_edit_see);
+// set
+DEC_CMD(_edit_set);
+DEC_CMD(_edit_setk);
+DEC_CMD(_edit_setv);
+DEC_CMD(_edit_setw);
+// unset
+DEC_CMD(_edit_unset);
 
-
-/********************************************************************
-** This is a lame sheduler. Just for parallel commands. Hmm... Like
-** interface manager. Singleton used.
-*/
-class Scheduler
-{
-public:
-	static Scheduler* GetInstance()
-	{
-		static Scheduler instance;
-		
-		return &instance;
-	}
-
-	void AddTask(CommandPtr cmd, ArgListPtr args);
-	void Run();
-
-private:
-	Scheduler() {}
-	Scheduler(const Scheduler&) = delete;
-	Scheduler& operator=(const Scheduler&) = delete;
-
-	void _RecycleTask(Task& task);
-
-	std::queue<Task> m_queue;
-};
-
-#endif
+// hidden
+DEC_CMD(_edit_unknown);
+DEC_CMD(_edit_quit);

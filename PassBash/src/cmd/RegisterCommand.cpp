@@ -20,28 +20,9 @@
  *   Visual Studio 2022 Community Preview                                     *
  ******************************************************************************/
 
-#include "../../inc/cmd/CommandHeader.h"
+#include "../../inc/cmd/FunctionUtil.h"
 
-void RegisterCommand::OnStart()
-{
-	_PrintGreeting();
-}
-
-bool RegisterCommand::Handle(const ArgListPtr args)
-{
-	_ReceiveNewPassword();
-	_ReEncryptData();
-
-	if (!HAS_ERROR())
-	{
-		Scheduler::GetInstance()
-			->AddTask(CommandFactory::SpawnSpecial("Host"), nullptr);
-	}
-
-	return !HAS_ERROR();
-}
-
-void RegisterCommand::_PrintGreeting()
+static void _reg_greet()
 {
 	WORD old = cnsl::SetTextForeground(FOREGROUND_LIGHT(GREETING_COLOR));
 	cnsl::InsertText(" Welcome to PassBash, my friend! ");
@@ -61,21 +42,38 @@ void RegisterCommand::_PrintGreeting()
 	cnsl::SetTextForeground(old);
 }
 
-void RegisterCommand::_ReceiveNewPassword()
+static void _receive_password()
 {
-	char buffer[24];
-	
+	char buffer[g_PASSWORD_BUFFER_SIZE + 1];
+
 	cnsl::InsertText("6 to 16 characters, any ascii that is printable.\n");
 	cnsl::InsertText(PROMPT_COLOR, "$ ");
-	cnsl::GetString(buffer, 6, 16);
-
-	g_password = buffer;
+	cnsl::GetString(buffer, 6, g_PASSWORD_LENGTH);
+	cnsl::InsertNewLine();
+	_format_password(buffer, g_password);
 }
 
-void RegisterCommand::_ReEncryptData()
+static void _reencrtypt_data()
 {
 	g_config.Save();
-	g_passDoc.Load(g_default.c_str());
-	g_passDoc.Save(g_password.c_str());
+	g_passDoc.Load(g_default);
+	g_passDoc.Save(g_password);
 	g_passDoc.UnLoad();
+}
+
+DEC_CMD(reg)
+{
+	_reg_greet();
+
+	_receive_password();
+	_reencrtypt_data();
+
+	int ret = g_hiddenFactory.execl("host", nullptr);
+	if (ret == -1)
+	{
+		cnsl::InsertText(ERROR_COLOR, "Failed to launch host service!\n");
+		return 1;
+	}
+
+	return 0;
 }

@@ -24,7 +24,7 @@
 #define _PASS_DOC_H_
 
 #include "../utility/xml.h"
-#include "../utility/Auxilliary.h"
+#include "../utility/Auxiliary.h"
 
 #include <vector>
 #include <string>
@@ -65,9 +65,6 @@ public:
 
 	XMLElementPtr NewElement(const char* name);
 	void DeleteElement(XMLElementPtr node);
-
-	void GetPresentWorkingDirectory(std::string& path);
-	void GetWorkingDirectory(XMLElementPtr node, std::string& path);
 
 	// Mark modified.
 	void Mark();
@@ -152,8 +149,8 @@ void DeleteNode(XMLElementPtr node);
 
 XMLElementPtr AddChildNode(XMLElementPtr node, XMLElementPtr child);
 
-const char* GetNodePath(XMLElementPtr node, std::string& path);
-
+const char* GetNodeDirectory(XMLElementPtr node, std::string& path);
+const char* GetPresentWorkingDirectory(std::string& path);
 
 /*
 **+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -173,6 +170,8 @@ XMLElementPtr GetOrCreateChildNode(XMLElementPtr node, const char* tag, const ch
 void DeleteChildNode(XMLElementPtr node, const char* name);
 void DeleteChildren(XMLElementPtr node);
 
+bool IsParent(XMLElementPtr parent, XMLElementPtr child);
+
 /*
 **+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 ** Group
@@ -185,7 +184,7 @@ XMLElementPtr CreateGroupNodeByPath(const std::string& path);
 ** Item
 **+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 */
-XMLElementPtr CreateItemNodeByPath(const std::string& path, const char* name);
+XMLElementPtr CreateItemNodeByPath(const std::string& path);
 void GetBaseName(const std::string& path, std::string& name);
 
 /*
@@ -225,6 +224,7 @@ bool GetEntry(XMLElementPtr node, const char* key, Entry* entry);
 bool GetEntries(XMLElementPtr node, EntryList& entries);
 
 XMLElementPtr GetEntryNode(XMLElementPtr node, const char* key);
+XMLElementPtr GetEntryNode(XMLElementPtr node, int id);
 XMLElementPtr GetOrCreateEntryNode(XMLElementPtr node, const char* key);
 
 // If exists, it will override current one.

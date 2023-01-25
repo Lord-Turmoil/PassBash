@@ -9,7 +9,7 @@
  *                                                                            *
  *                     Start Date : January 17, 2023                          *
  *                                                                            *
- *                    Last Update :                                           *
+ *                    Last Update : January 25, 2023                          *
  *                                                                            *
  * -------------------------------------------------------------------------- *
  * Over View:                                                                 *
@@ -25,40 +25,21 @@
 ** gonna be some leading characters.
 */
 
-#include "../../inc/cmd/CommandHeader.h"
+#include "../../inc/cmd/FunctionUtil.h"
 
 /*
 **+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 ** tree [group name]
 **+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 */
-bool TreeCommand::Handle(const ArgListPtr args)
+static void _tree_usage()
 {
-	if (args && (args->size() > 1))
-	{
-		cnsl::InsertText(ERROR_COLOR, ARGUMENTS_ILLEGAL);
-		cnsl::InsertNewLine();
-		cnsl::InsertText(MESSAGE_COLOR, "Usage: ls <item name>");
-		cnsl::InsertNewLine();
-		return false;
-	}
+	cnsl::InsertText(MESSAGE_COLOR, "Usage: ls <item name>");
+}
 
-	XMLElementPtr current = g_passDoc.GetCurrent();
-	XMLElementPtrList list;
-	if (!args || args->empty())
-		_Tree(current, " ");
-	else
-	{
-		XMLElementPtr node = GetNodeByPath((*args)[0]);
-		if (!node)
-		{
-			cnsl::InsertText(ERROR_COLOR, "Group doesn't exist!\n");
-			return false;
-		}
-		_Tree(node, " ");
-	}
-
-	return true;
+static int _tree_parse_args(int argc, char* argv[], std::string& path)
+{
+	return _parse_optional_args(argc, argv, path);
 }
 
 /********************************************************************
@@ -69,7 +50,7 @@ bool TreeCommand::Handle(const ArgListPtr args)
 ** ...|..  \-- beta [leading ".'..|..'.....]
 ** ...
 */
-void TreeCommand::_Tree(XMLElementPtr node, const std::string& leading)
+static void _tree(XMLElementPtr node, const std::string& leading)
 {
 	// First output itself, with leading previously added.
 	if (IsGroup(node))
@@ -89,13 +70,35 @@ void TreeCommand::_Tree(XMLElementPtr node, const std::string& leading)
 		if (it != list.back())
 		{
 			cnsl::InsertText("  |--");
-			_Tree(it, leading + "  |  ");
+			_tree(it, leading + "  |  ");
 		}
 		else
 		{
 			cnsl::InsertText("  \\--");
-			_Tree(it, leading + "     ");
+			_tree(it, leading + "     ");
 		}
 		it = it->NextSiblingElement();
 	}
+}
+
+DEC_CMD(tree)
+{
+	std::string path;
+
+	GetPresentWorkingDirectory(path);
+	if (_tree_parse_args(argc, argv, path) != 0)
+	{
+		_tree_usage();
+		return 1;
+	}
+	
+	XMLElementPtr node = GetNodeByPath(path);
+	if (!node)
+	{
+		cnsl::InsertText(ERROR_COLOR, "Group doesn't exist!\n");
+		return 2;
+	}
+	_tree(node, " ");
+	
+	return 0;
 }

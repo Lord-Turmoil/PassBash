@@ -3,50 +3,60 @@
  ******************************************************************************
  *                   Project Name : PassBash                                  *
  *                                                                            *
- *                      File Name : Sheduler.cpp                              *
+ *                      File Name : FunctionHeader.h                          *
  *                                                                            *
  *                     Programmer : Tony Skywalker                            *
  *                                                                            *
- *                     Start Date : January 16, 2023                          *
+ *                     Start Date : January 17, 2023                          *
  *                                                                            *
  *                    Last Update :                                           *
  *                                                                            *
  * -------------------------------------------------------------------------- *
  * Over View:                                                                 *
- *   Command shedualer.                                                       *
+ *   Include all headers for all command related cpp.                         *
  * -------------------------------------------------------------------------- *
  * Build Environment:                                                         *
  *   Windows 11 Pro                                                           *
  *   Visual Studio 2022 Community Preview                                     *
  ******************************************************************************/
 
-#include "../../inc/cmd/Scheduler.h"
+#ifndef _FUCTION_HEADER_H_
+#define _FUCTION_HEADER_H_
 
-void Scheduler::AddTask(CommandPtr cmd, ArgListPtr args)
-{
-	m_queue.push(Task{ cmd, args });
-}
+#include "../../inc/cmd/Command.h"
+#include "../../inc/cmd/FunctionUtil.h"
 
-void Scheduler::Run()
-{
-	while (!m_queue.empty())
-	{
-		Task task = m_queue.front();
+#include "../common/Logger.h"
 
-		if (task.cmd)
-		{
-			task.cmd->OnStart();
-			task.cmd->Handle(task.args);
-			task.cmd->OnEnd();
-		}
+#include "../core/Global.h"
+#include "../core/Config.h"
 
-		_RecycleTask(task);
-		m_queue.pop();
-	}
-}
+#include "../utility/xml.h"
 
-void Scheduler::_RecycleTask(Task& task)
-{
-	if (task.args)
-		delete task.args;
-}
+#include <cnsl.h>
+
+
+#ifdef max
+#undef max
+#endif
+#ifdef min
+#undef min
+#endif
+
+typedef unsigned short WORD;
+
+// Some colors.
+#define PROMPT_COLOR   FOREGROUND_LIGHT(FOREGROUND_BLUE)
+#define GREETING_COLOR FOREGROUND_GREEN
+#define ERROR_COLOR    FOREGROUND_RED
+#define MESSAGE_COLOR  FOREGROUND_YELLOW
+#define GROUP_COLOR    FOREGROUND_CYAN
+#define PWD_COLOR      FOREGROUND_MAGENTA
+#define ITEM_COLOR     FOREGROUND_LIGHT(FOREGROUND_MAGENTA)
+#define ENTRY_MODIFY_COLOR FOREGROUND_LIGHT(FOREGROUND_GREEN)
+#define ENTRY_DELETE_COLOR FOREGROUND_LIGHT(FOREGROUND_RED)
+
+// Some errors.
+#define ARGUMENTS_ILLEGAL "Arguments illegal!"
+
+#endif

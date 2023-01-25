@@ -20,49 +20,32 @@
  *   Visual Studio 2022 Community Preview                                     *
  ******************************************************************************/
 
-#include "../../inc/cmd/CommandHeader.h"
+#include "../../inc/cmd/FunctionUtil.h"
 
-void ChangePasswordCommand::OnStart()
+static void _change_greet()
 {
-	cnsl::Clear();
-	cnsl::Print();
-
 	cnsl::InsertText(MESSAGE_COLOR, "You are now changing your master password.\n");
 	cnsl::InsertText(MESSAGE_COLOR, "Press ESC to abort operation.\n");
 }
 
-bool ChangePasswordCommand::Handle(const ArgListPtr args)
+static int _authorize()
 {
-	if (_Authorize())
-	{
-		if (_ReceivePassword())
-		{
-			_ReEncryptData();
-			return STATUS();
-		}
-	}
-
-	return STATUS();
-}
-
-bool ChangePasswordCommand::_Authorize()
-{
-	char buffer[32];
+	char buffer[g_PASSWORD_BUFFER_SIZE + 1];
 	int ret;
 
 	cnsl::InsertText(MESSAGE_COLOR, "Please enter your old master password.\n");
 	cnsl::InsertText(PROMPT_COLOR, "$ ");
 	do
 	{
-		ret = cnsl::GetPasswordInterruptable(buffer, 0, 31);
+		ret = cnsl::GetPasswordInterruptable(buffer, 0, g_PASSWORD_BUFFER_SIZE);
 		if (ret == -1)
 		{
 			cnsl::InsertNewLine();
-			return false;
+			return 1;
 		}
 	} while (ret == 0);
 
-	while (g_password != buffer)
+	while (_STR_DIFF(g_password, buffer))
 	{
 		cnsl::InsertNewLine();
 		cnsl::InsertText(ERROR_COLOR, "WRONG PASSWORD!");
@@ -74,11 +57,11 @@ bool ChangePasswordCommand::_Authorize()
 		{
 			cnsl::Clear(0);
 			cnsl::InsertText(PROMPT_COLOR, "$ ");
-			ret = cnsl::GetPasswordInterruptable(buffer, 0, 31);
+			ret = cnsl::GetPasswordInterruptable(buffer, 0, g_PASSWORD_BUFFER_SIZE);
 			if (ret == -1)
 			{
 				cnsl::InsertNewLine();
-				return false;
+				return 1;
 			}
 		} while (ret == 0);
 	}
@@ -86,12 +69,12 @@ bool ChangePasswordCommand::_Authorize()
 	cnsl::InsertNewLine();
 	cnsl::InsertText(GREETING_COLOR, "Credential confirmed!\n");
 
-	return true;
+	return 0;
 }
 
-bool ChangePasswordCommand::_ReceivePassword()
+static int _receive_password()
 {
-	char buffer[32];
+	char buffer[g_PASSWORD_BUFFER_SIZE + 1];
 	int ret;
 
 	cnsl::InsertText(MESSAGE_COLOR, "Please enter new master password.\n");
@@ -100,34 +83,48 @@ bool ChangePasswordCommand::_ReceivePassword()
 	{
 		cnsl::Clear(0);
 		cnsl::InsertText(PROMPT_COLOR, "$ ");
-		ret = cnsl::GetStringInterruptible(buffer, 6, 16);
+		ret = cnsl::GetStringInterruptible(buffer, 6, g_PASSWORD_LENGTH);
 		if (ret == -1)
 		{
 			cnsl::InsertNewLine();
-			return false;
+			return 1;
 		}
 	} while (ret < 6);
 
-	g_password = buffer;
+	_format_password(buffer, g_password);
 
 	cnsl::InsertNewLine();
 	cnsl::InsertText(GREETING_COLOR, "New master password saved!\n");
 	cnsl::InsertText(MESSAGE_COLOR, "Tips: Use clear to prevent leak of password.\n");
-	Sleep(1000);
+	// Sleep(1000);
 	// cnsl::Clear();
 	// cnsl::Print();
 
-	return true;
+	return 0;
 }
 
-bool ChangePasswordCommand::_ReEncryptData()
+static int _reencrypt_data()
 {
 	g_config.Save();
-	if (!g_passDoc.Save(g_password.c_str()))
+	if (!g_passDoc.Save(g_password))
 	{
 		cnsl::InsertText(ERROR_COLOR, "Failed to re-encrypt data!\n");
-		return false;
+		return 1;
 	}
 
-	return true;
+	return 0;
+}
+
+
+DEC_CMD(change)
+{
+	_change_greet();
+
+	if (_authorize())
+	{
+		if (_receive_password())
+			return _reencrypt_data();
+	}
+
+	return 2;
 }

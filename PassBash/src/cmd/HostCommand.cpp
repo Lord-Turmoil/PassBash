@@ -20,20 +20,14 @@
  *   Visual Studio 2022 Community Preview                                     *
  ******************************************************************************/
 
-#include "../../inc/cmd/CommandHeader.h"
-#include "../../inc/utility/Auxilliary.h"
-
-#include <cstring>
+#include "../../inc/cmd/FunctionUtil.h"
 
 
 static char HOST_IGNORE[] = " ";
 static char HOST_WAITING[] = R"(-\|/)";
 
-void HostCommand::OnStart()
+static void _host_greet()
 {
-	cnsl::Clear();
-	cnsl::Print();
-	
 	/*
 	** 2022/01/20 TS: Commented animation.
 	cnsl::InsertText(MESSAGE_COLOR, "Initializing Pash Host...  ");
@@ -47,91 +41,79 @@ void HostCommand::OnStart()
 	cnsl::InsertDelete();
 	cnsl::InsertText(GREETING_COLOR, "\nPash Host fully operational!\n");
 	*/
-	cnsl::InsertText(MESSAGE_COLOR, "User \"help\" for more information.\n\n");
 
+	// cnsl::Clear();
+	// cnsl::Print();
+	cnsl::InsertText(GREETING_COLOR, "Pash Host fully operational!\n");
+	cnsl::InsertText(MESSAGE_COLOR, "Use \"help\" for more information.\n");
+	cnsl::InsertSplitLine('_');
+	
 	cnsl::FlushInput();
 }
 
-bool HostCommand::Handle(const ArgListPtr args)
+static int _host_load_data()
 {
-	if (!_LoadData())
+	if (g_passDoc.Load(g_password))
+		return 0;
+	else
+		return 1;
+}
+
+static char _buffer[CMD_BUFFER_SIZE + 1];
+static char* _cmd;
+static int _argc;
+static char* _argv[CMD_ARG_SIZE];
+
+static int _host_peek_command()
+{
+	_cmd = nullptr;
+
+	cnsl::InsertText(PWD_COLOR, "%s", g_pwd.c_str());
+	cnsl::InsertText(PROMPT_COLOR, "\b$ ");
+	cnsl::GetStringInterruptible(_buffer, 0, CMD_BUFFER_SIZE);
+	
+	char* context = nullptr;
+	char* token = strtok_s(_buffer, HOST_IGNORE, &context);
+	if (!token)	// nothing.
+		return 0;
+
+	// first arg is command name
+	_argc = 0;
+	_cmd = token;
+	_argv[_argc++] = _cmd;
+	
+	while (token = strtok_s(nullptr, HOST_IGNORE, &context))
+		_argv[_argc++] = token;
+	_argv[_argc] = nullptr;
+
+	return 0;
+}
+
+int host(int argc, char* argv[])
+{
+	if (_host_load_data())
 	{
 		LOG_ERROR("\t|- Data file crashed!");
 		LOG_ERROR("Pash Host has encountered critical error!");
-		return false;
+		return 1;
 	}
 
-	Task task;
-	while (_PeekTask(task))
+	_host_greet();
+
+	while (_host_peek_command() == 0)
 	{
 		cnsl::InsertNewLine();
-		if (task.cmd)
-		{
-			task.cmd->OnStart();
-			task.cmd->Handle(task.args);
-			task.cmd->OnEnd();
-		}
-		_RecycleTask(task);	
+		if (!_cmd)
+			continue;
+
+		int ret = g_generalFactory.execv(_cmd, _argv);
+		if (ret == -1)			// unknown
+			g_hiddenFactory.execl("unknown", "unknown", _cmd, nullptr);
+		else if (ret == 66)	// exit
+			break;
+		else if (ret != 0)
+			LOG_ERROR("\"%s\" -- Error Code: %d", _cmd, ret);
 	}
-	cnsl::InsertNewLine();
 
-	return !HAS_ERROR();
-}
-
-bool HostCommand::_LoadData()
-{
-	return g_passDoc.Load(g_password.c_str());
-}
-
-/********************************************************************
-** If no command detected, or is invalid command, return nullptr.
-*/
-bool HostCommand::_PeekTask(Task& task)
-{
-	static char buffer[256];
-	static char* context = nullptr;
-
-	task.cmd = nullptr;
-	task.args = nullptr;
-	
-	cnsl::InsertText(PWD_COLOR, "%s", g_pwd.c_str());
-	cnsl::InsertText(PROMPT_COLOR, "\b$ ");
-	cnsl::GetString(buffer, 1, 255);
-
-	char* token = strtok_s(buffer, HOST_IGNORE, &context);
-	if (!token)	// nothing.
-		return true;
-	else if (_STR_SAME(token, "quit") || _STR_SAME(token, "q"))
-		return false;
-	
-	task.cmd = CommandFactory::Spawn(token);
-	if (!task.cmd)
-		_UnRecognized(token);
-	else
-	{
-		token = strtok_s(nullptr, HOST_IGNORE, &context);
-		if (token)
-		{
-			task.args = new ArgList();
-			while (token)
-			{
-				task.args->push_back(token);
-				token = strtok_s(nullptr, HOST_IGNORE, &context);
-			}
-		}
-	}	
-
-	return true;
-}
-
-void HostCommand::_UnRecognized(const char* cmd)
-{
-	cnsl::InsertNewLine();
-	cnsl::InsertText(ERROR_COLOR, "\"%s\" is not a command.", cmd);
-}
-
-void HostCommand::_RecycleTask(Task& task)
-{
-	if (task.args)
-		delete task.args;
+	return 0;
 }

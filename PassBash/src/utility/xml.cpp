@@ -26,7 +26,7 @@
 #include <string.h>
 
 #include "../../inc/utility/xml.h"
-#include "../../inc/utility/auxilliary.h"
+#include "../../inc/utility/Auxiliary.h"
 
 
 /******************************************************************************

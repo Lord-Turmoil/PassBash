@@ -48,7 +48,7 @@
     <ClInclude Include="inc\utility\xml.h">
       <Filter>Header Files\utility</Filter>
     </ClInclude>
-    <ClInclude Include="inc\utility\Auxilliary.h">
+    <ClInclude Include="inc\utility\Auxiliary.h">
       <Filter>Header Files\utility</Filter>
     </ClInclude>
     <ClInclude Include="inc\core\Entry.h">
@@ -72,22 +72,19 @@
     <ClInclude Include="inc\common\Logger.h">
       <Filter>Header Files\common</Filter>
     </ClInclude>
-    <ClInclude Include="inc\cmd\Command.h">
+    <ClInclude Include="inc\cmd\Functions.h">
       <Filter>Header Files\cmd</Filter>
     </ClInclude>
     <ClInclude Include="inc\core\Global.h">
       <Filter>Header Files\core</Filter>
     </ClInclude>
-    <ClInclude Include="inc\cmd\Scheduler.h">
-      <Filter>Header Files\cmd</Filter>
-    </ClInclude>
     <ClInclude Include="inc\core\Config.h">
       <Filter>Header Files\core</Filter>
     </ClInclude>
-    <ClInclude Include="inc\cmd\CommandFactory.h">
+    <ClInclude Include="inc\cmd\Command.h">
       <Filter>Header Files\cmd</Filter>
     </ClInclude>
-    <ClInclude Include="inc\cmd\CommandHeader.h">
+    <ClInclude Include="inc\cmd\FunctionHeader.h">
       <Filter>Header Files\cmd</Filter>
     </ClInclude>
     <ClInclude Include="inc\core\PassDoc.h">
@@ -95,6 +92,15 @@
     </ClInclude>
     <ClInclude Include="resource.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\cmd\Editor.h">
+      <Filter>Header Files\cmd</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\cmd\FunctionUtil.h">
+      <Filter>Header Files\cmd</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\cmd\Service.h">
+      <Filter>Header Files\cmd</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -125,16 +131,13 @@
     <ClCompile Include="src\core\Global.cpp">
       <Filter>Source Files\core</Filter>
     </ClCompile>
-    <ClCompile Include="src\cmd\Scheduler.cpp">
-      <Filter>Source Files\cmd</Filter>
-    </ClCompile>
     <ClCompile Include="src\core\Config.cpp">
       <Filter>Source Files\core</Filter>
     </ClCompile>
     <ClCompile Include="src\test\ConfigTest.cpp">
       <Filter>Source Files\test</Filter>
     </ClCompile>
-    <ClCompile Include="src\cmd\CommandFactory.cpp">
+    <ClCompile Include="src\cmd\Command.cpp">
       <Filter>Source Files\cmd</Filter>
     </ClCompile>
     <ClCompile Include="src\cmd\RegisterCommand.cpp">
@@ -152,7 +155,7 @@
     <ClCompile Include="src\test\MainTest.cpp">
       <Filter>Source Files\test</Filter>
     </ClCompile>
-    <ClCompile Include="src\cmd\Command.cpp">
+    <ClCompile Include="src\cmd\Functions.cpp">
       <Filter>Source Files\cmd</Filter>
     </ClCompile>
     <ClCompile Include="src\cmd\TreeCommand.cpp">
@@ -171,6 +174,15 @@
       <Filter>Source Files\cmd</Filter>
     </ClCompile>
     <ClCompile Include="src\cmd\FindCommand.cpp">
+      <Filter>Source Files\cmd</Filter>
+    </ClCompile>
+    <ClCompile Include="src\utility\Auxiliary.cpp">
+      <Filter>Source Files\utility</Filter>
+    </ClCompile>
+    <ClCompile Include="src\cmd\FunctionUtil.cpp">
+      <Filter>Source Files\cmd</Filter>
+    </ClCompile>
+    <ClCompile Include="src\cmd\InitCommand.cpp">
       <Filter>Source Files\cmd</Filter>
     </ClCompile>
   </ItemGroup>

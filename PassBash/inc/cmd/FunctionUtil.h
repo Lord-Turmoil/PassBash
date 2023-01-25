@@ -3,74 +3,67 @@
  ******************************************************************************
  *                   Project Name : PassBash                                  *
  *                                                                            *
- *                      File Name : Macros.h                                  *
+ *                      File Name : FunctionUtil.h                            *
  *                                                                            *
  *                     Programmer : Tony Skywalker                            *
  *                                                                            *
- *                     Start Date : January 15, 2023                          *
+ *                     Start Date : January 25, 2023                          *
  *                                                                            *
  *                    Last Update :                                           *
  *                                                                            *
  * -------------------------------------------------------------------------- *
  * Over View:                                                                 *
- *   Macros.                                                                  *
+ *   Some utility functions.                                                  *
  * -------------------------------------------------------------------------- *
  * Build Environment:                                                         *
  *   Windows 11 Pro                                                           *
  *   Visual Studio 2022 Community Preview                                     *
  ******************************************************************************/
 
-#ifndef _MACROS_H_
-#define _MACROS_H_
+#ifndef _FUNCTION_UTIL_H_
+#define _FUNCTION_UTIL_H_
 
-#include <memory>
-
-#define DECLARE_CLASS(CLASS) \
-	class CLASS;             \
-	typedef CLASS* CLASS##Ptr;
-
-#define DECLARE_SMART_CLASS(CLASS) \
-	class CLASS;                   \
-	typedef std::shared_ptr<CLASS> CLASS##Ptr;
-
-
-#define BIT(X) (1 << (X))
+#include "FunctionHeader.h"
 
 /*
 **+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-** Command
+** Basic argument parsing.
 **+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 */
-typedef int (*Command)(int, char* []);
-#define DEC_CMD(CMD) int CMD##(int argc, char* argv[])
+extern char* optarg;
+extern const char* optmsg;
+extern int opterr;
+extern int optopt;
 
-const int CMD_BUFFER_SIZE = 256;
-const int CMD_ARG_SIZE = 64;		// maximum 64 arguments
+void resetopt();
+int getopt(int argc, char* argv[], const char* pattern);
+
 
 /*
 **+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-** Debug related.
+** Advanced argument parsing.
 **+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 */
-#if defined(DEBUG) || defined(_DEBUG)
-#define PASH_DEBUG
-#endif
+int _parse_optional_args(int argc, char* argv[], std::string& _1);
+int _parse_args(int argc, char* argv[], std::string& _1);
+int _parse_args(int argc, char* argv[], std::string& _1, std::string& _2);
 
-#ifdef PASH_DEBUG
-#include <cassert>
-#endif
 
-#ifdef PASH_DEBUG
-#define PASH_ASSERT(...) assert(__VA_ARGS__)
-#else
-#define PASH_ASSERT(...)
-#endif
+/*
+**+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+** Common operations.
+**+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+*/
+int _show_item(XMLElementPtr node, const char* key, WORD color = 0);
 
-// For cheat save.
-#define PASH_CHEAT
 
-// For unit test.
-#define PASH_TEST 0
-
+/*
+**+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+** Password operations.
+**+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+*/
+// fill password with '/0'. 
+void _format_password(char* password);
+void _format_password(const char* buffer, char* password);
 
 #endif
