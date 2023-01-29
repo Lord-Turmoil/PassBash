@@ -345,14 +345,24 @@ DEC_CMD(rm)
 
 	if (!IsParent(g_passDoc.GetCurrent(), node))
 	{
-		cnsl::InsertText(ERROR_COLOR, "Do not attempt to remove parent or self!\n");
+		cnsl::InsertText(ERROR_COLOR, "Do not attempt to remove parent group!\n");
 		return 3;
 	}
 
 	if (_remove_confirm("You're sure? (Y/N) $ "))
 	{
-		cnsl::InsertText(MESSAGE_COLOR,  "Group \"%s\" and its contents are deleted permanently!\n",
-			IsGroup(node) ? "Group" : "Password item", path.c_str());
+		if (IsGroup(node))
+		{
+			cnsl::InsertText(MESSAGE_COLOR,
+				"Group \"%s\" and its contents are deleted permanently!\n",
+				path.c_str());
+		}
+		else
+		{
+			cnsl::InsertText(MESSAGE_COLOR,
+				"Password item \"%s\" is deleted permanently!\n",
+				path.c_str());
+		}	
 		DeleteNode(node);
 	}
 	else
