@@ -77,9 +77,9 @@ void init_factory()
 	HOOKD(g_editorFactory, "sw", _edit_setw);
 	HOOKD(g_editorFactory, "unset", _edit_unset);
 	HOOKD(g_editorFactory, "ust", _edit_unset);
-	HOOKD(g_editorFactory, "unknown", _edit_unknown);
 	HOOKD(g_editorFactory, "quit", _edit_quit);
 	HOOKD(g_editorFactory, "q", _edit_quit);
+	HOOKD(g_hiddenFactory, "_edit_unknown", _edit_unknown);
 
 	// hidden
 	HOOKC(g_hiddenFactory, start);

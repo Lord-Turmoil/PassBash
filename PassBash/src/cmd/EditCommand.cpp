@@ -170,7 +170,7 @@ DEC_CMD(_edit)
 
 			int ret = g_editorFactory.execl(type, type, arg, nullptr);
 			if (ret == -1)
-				g_editorFactory.execl("unknown", "unknown", type, nullptr);
+				g_hiddenFactory.execl("_edit_unknown", "_edit_unknown", type, nullptr);
 			else if (ret == 66)
 				break;
 			else if (ret != 0)

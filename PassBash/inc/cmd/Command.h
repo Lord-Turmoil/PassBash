@@ -36,10 +36,11 @@ public:
 	** Returns:    0 -- succeeded
 	**            -1 -- no such command, or it self is failed
 	**          else -- command failed
-	** Warning: args must not be nullptr.
+	** Warning: argument list must end with nullptr
+	**          argv[] must not be nullptr
 	*/
-	int execl(const char* cmd, ...);	// end with nullptr
-	int execv(const char* cmd, char* argv[]);
+	int execl(const char* cmd, ...);			// ends with nullptr
+	int execv(const char* cmd, char* argv[]);	// ends with nullptr
 	int hook(const char* descr, Command cmd);
 	int unhook(const char* descr);
 
