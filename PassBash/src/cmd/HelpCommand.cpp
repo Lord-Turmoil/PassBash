@@ -58,7 +58,8 @@ DEC_CMD(help)
 	cnsl::InsertText("             ls -- list group and item in current group or specified group\n");
 	cnsl::InsertText("                    usage: ls [group name]\n\n");
 	cnsl::InsertText("           tree -- list nodes in tree form\n");
-	cnsl::InsertText("                    usage: tree [group name]\n\n");
+	cnsl::InsertText("                    usage: tree [group name]\n");
+	cnsl::InsertText("                           -g -- list groups only\n\n");
 	cnsl::InsertText("      edit, mod -- edit password item\n");
 	cnsl::InsertText("                    usage: mod <item name>\n\n");
 	cnsl::InsertText("       move, mv -- move group or item recursively\n");

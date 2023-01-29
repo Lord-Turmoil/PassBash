@@ -32,14 +32,64 @@
 ** tree [group name]
 **+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 */
+static bool group_only;
+
+static void _tree_init()
+{
+	group_only = false;
+}
+
 static void _tree_usage()
 {
-	cnsl::InsertText(MESSAGE_COLOR, "Usage: ls <item name>");
+	cnsl::InsertText(MESSAGE_COLOR, "Usage: tree [options] <item name>\n");
+	cnsl::InsertText(MESSAGE_COLOR, "  -g -- list groups only\n");
 }
 
 static int _tree_parse_args(int argc, char* argv[], std::string& path)
 {
-	return _parse_optional_args(argc, argv, path);
+	int opt;
+	bool flag = false;
+	bool err = false;
+	bool tag = false;
+	while (opt = getopt(argc, argv, "g"))
+	{
+		switch (opt)
+		{
+		case 'g':
+			group_only = true;
+			break;
+		case '!':
+			if (flag)
+			{
+				err = true;
+				if (!tag)
+				{
+					cnsl::InsertText(ERROR_COLOR, "Too many arguments!\n");
+					tag = true;
+				}
+			}
+			else
+			{
+				flag = true;
+				path = optarg;
+			}
+			break;
+		case '?':
+			err = true;
+			cnsl::InsertText(ERROR_COLOR, "Unknown parameter \"-%c\"\n", optopt);
+			break;
+		default:
+			break;
+		}
+	}
+	if (err)
+	{
+		cnsl::InsertText(ERROR_COLOR, ARGUMENTS_ILLEGAL);
+		cnsl::InsertNewLine();
+		return 1;
+	}
+
+	return 0;
 }
 
 /********************************************************************
@@ -63,7 +113,10 @@ static void _tree(XMLElementPtr node, const std::string& leading)
 
 	// Then, output its children with leading.
 	XMLElementPtrList list;
-	GetChildren(node, list);
+	if (group_only)
+		GetGroupChildren(node, list);
+	else
+		GetChildren(node, list);
 	for (auto it : list)
 	{
 		cnsl::InsertText("%s", leading.c_str());
@@ -84,6 +137,8 @@ static void _tree(XMLElementPtr node, const std::string& leading)
 DEC_CMD(tree)
 {
 	std::string path;
+
+	_tree_init();
 
 	GetPresentWorkingDirectory(path);
 	if (_tree_parse_args(argc, argv, path) != 0)

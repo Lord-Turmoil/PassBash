@@ -178,6 +178,7 @@ bool IsParent(XMLElementPtr parent, XMLElementPtr child);
 **+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 */
 XMLElementPtr CreateGroupNodeByPath(const std::string& path);
+bool GetGroupChildren(XMLElementPtr node, XMLElementPtrList& nodes);
 
 /*
 **+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+

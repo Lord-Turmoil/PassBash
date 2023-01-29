@@ -48,6 +48,7 @@ static int _find_parse_args(int argc, char* argv[])
 	int opt;
 	bool flag = false;
 	bool err = false;
+	bool tag = false;
 	while (opt = getopt(argc, argv, "ds"))
 	{
 		switch (opt)
@@ -62,7 +63,11 @@ static int _find_parse_args(int argc, char* argv[])
 			if (flag)
 			{
 				err = true;
-				cnsl::InsertText(ERROR_COLOR, "Too many arguments!\n");
+				if (!tag)
+				{
+					cnsl::InsertText(ERROR_COLOR, "Too many arguments!\n");
+					tag = true;
+				}
 			}
 			else
 			{

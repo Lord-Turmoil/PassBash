@@ -478,6 +478,23 @@ XMLElementPtr CreateGroupNodeByPath(const std::string& path)
 }
 
 
+bool GetGroupChildren(XMLElementPtr node, XMLElementPtrList& nodes)
+{
+	nodes.clear();
+
+	XMLElementPtr p = node->FirstChildElement();
+	while (p)
+	{
+		if (IsGroup(p))
+			nodes.push_back(p);
+		p = p->NextSiblingElement();
+	}
+
+	std::sort(nodes.begin(), nodes.end(), XMLElementPtrCompare());
+
+	return true;
+}
+
 /*
 **+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 ** Item

@@ -118,6 +118,7 @@ int _parse_optional_args(int argc, char* argv[], std::string& _1)
 	int opt;
 	bool flag = false;
 	bool err = false;
+	int tag = false;
 	while (opt = getopt(argc, argv, ""))
 	{
 		switch (opt)
@@ -126,7 +127,11 @@ int _parse_optional_args(int argc, char* argv[], std::string& _1)
 			if (flag)
 			{
 				err = true;
-				cnsl::InsertText(ERROR_COLOR, "Too many arguments!\n");
+				if (!tag)
+				{
+					cnsl::InsertText(ERROR_COLOR, "Too many arguments!\n");
+					tag = true;
+				}
 			}
 			else
 			{
@@ -157,6 +162,7 @@ int _parse_args(int argc, char* argv[], std::string& _1)
 	int opt;
 	bool flag = false;
 	bool err = false;
+	bool tag = false;
 	while (opt = getopt(argc, argv, ""))
 	{
 		switch (opt)
@@ -165,7 +171,11 @@ int _parse_args(int argc, char* argv[], std::string& _1)
 			if (flag)
 			{
 				err = true;
-				cnsl::InsertText(ERROR_COLOR, "Too many arguments!\n");
+				if (!tag)
+				{
+					cnsl::InsertText(ERROR_COLOR, "Too many arguments!\n");
+					tag = true;
+				}
 			}
 			else
 			{
@@ -199,6 +209,7 @@ int _parse_args(int argc, char* argv[], std::string& _1, std::string& _2)
 	int opt;
 	int cnt = 0;
 	bool err = false;
+	bool tag = false;
 	while (opt = getopt(argc, argv, ""))
 	{
 		switch (opt)
