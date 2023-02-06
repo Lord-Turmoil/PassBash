@@ -9,7 +9,7 @@ Copyright © Tony's Studio 2020 - 2023
 This is an open source project. Check it out on Gitee and Github!
 
 - [Gitee](https://gitee.com/tonys-studio/pass-bash)
-- [Github](https://github.com/Lord-Turmoil/PassBash) [ Currently unavailable :( ]
+- [Github](https://github.com/Lord-Turmoil/PassBash)
 
 You can also take a look at my blog - [PassBash](http://www.tonys-studio.top/2023/01/18/PassBash/). :)
 
