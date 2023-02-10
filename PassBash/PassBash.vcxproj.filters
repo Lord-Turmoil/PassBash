@@ -185,6 +185,9 @@
     <ClCompile Include="src\cmd\InitCommand.cpp">
       <Filter>Source Files\cmd</Filter>
     </ClCompile>
+    <ClCompile Include="src\cmd\TeaCommand.cpp">
+      <Filter>Source Files\cmd</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="PassBash.rc">

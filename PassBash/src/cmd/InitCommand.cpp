@@ -57,6 +57,7 @@ void init_factory()
 	HOOKD(g_generalFactory, "q", quit);
 	HOOKC(g_generalFactory, order);
 	HOOKC(g_generalFactory, change);
+	HOOKD(g_generalFactory, "tea", encrypt);
 
 	// editor
 	HOOKC(g_editorFactory, _edit);

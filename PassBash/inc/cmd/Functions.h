@@ -61,6 +61,9 @@ DEC_CMD(find);
 // edit <item name>
 DEC_CMD(edit);
 
+// tea [-u] <src> <dst> <password>
+DEC_CMD(encrypt);
+
 /*
 **+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 ** Hidden Command

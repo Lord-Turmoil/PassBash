@@ -118,7 +118,7 @@ int _parse_optional_args(int argc, char* argv[], std::string& _1)
 	int opt;
 	bool flag = false;
 	bool err = false;
-	int tag = false;
+	bool tag = false;
 	while (opt = getopt(argc, argv, ""))
 	{
 		switch (opt)
