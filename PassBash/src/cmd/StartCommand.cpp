@@ -48,7 +48,7 @@ DEC_CMD(start)
 {
 	_start_init_console();
 	cnsl::InsertText(FOREGROUND_LIGHT(FOREGROUND_CYAN),
-		"# Pash Host Version: 2.0.2\n\n");
+		"# Pash Host Version: 2.0.3\n\n");
 
 	_start_init_config();
 
