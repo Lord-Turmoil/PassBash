@@ -9,7 +9,7 @@
  *                                                                            *
  *                     Start Date : January 17, 2023                          *
  *                                                                            *
- *                    Last Update :                                           *
+ *                    Last Update : February 16, 2023                         *
  *                                                                            *
  * -------------------------------------------------------------------------- *
  * Over View:                                                                 *
@@ -42,14 +42,16 @@ bool PassDoc::Load(const char* password)
 	FILE* input;
 	if (fopen_s(&input, g_DATA_FILE, "rb") != 0)
 	{
+		LOG_ERROR("Missing file \"%s\"", g_DATA_FILE);
+		LOG_MESSAGE("Attempt to generate default data");
 		if (!_GenerateData())
 		{
-			LOG_ERROR("Essential data crashed!");
+			LOG_ERROR("Failed to generate initial data");
 			return false;
 		}
 		else if (fopen_s(&input, g_DATA_FILE, "rb") != 0)
 		{
-			LOG_ERROR("Missing file \"%s\"", g_DATA_FILE);
+			LOG_ERROR("Missing essential file \"%s\"", g_DATA_FILE);
 			return false;
 		}
 	}
@@ -67,7 +69,7 @@ bool PassDoc::Load(const char* password)
 	// Now xml file is in xml buffer!
 	if (!m_file.Parse(xml))
 	{
-		LOG_ERROR("\t|- Perhaps wrong password?");
+		LOG_ERROR("\t|- Perhaps wrong password or file missing?");
 		LOG_ERROR("Failed to load data!");
 		return false;
 	}

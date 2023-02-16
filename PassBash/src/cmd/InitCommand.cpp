@@ -28,6 +28,7 @@
 
 #define HOOKC(FACTORY, CMD) FACTORY##.hook(#CMD, CMD)
 #define HOOKD(FACTORY, DESCR, CMD) FACTORY##.hook(DESCR, CMD)
+
 void init_factory()
 {
 	// general

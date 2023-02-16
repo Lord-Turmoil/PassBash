@@ -9,7 +9,7 @@
  *                                                                            *
  *                     Start Date : January 17, 2023                          *
  *                                                                            *
- *                    Last Update :                                           *
+ *                    Last Update : February 16, 2023                         *
  *                                                                            *
  * -------------------------------------------------------------------------- *
  * Over View:                                                                 *
@@ -86,6 +86,13 @@ DEC_CMD(login)
 	{
 		cnsl::InsertText(ERROR_COLOR, "Failed to launch host service!\n");
 		return 2;
+	}
+	else if (ret != 0)
+	{
+		cnsl::InsertText(ERROR_COLOR, "Host service encountered critical error!\n");
+		LOG_PRINT_MESSAGE();
+		LOG_PRINT_ERROR();
+		cnsl::WaitForKey("Press any key to quit...");
 	}
 
 	return 0;
