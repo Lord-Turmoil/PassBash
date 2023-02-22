@@ -9,7 +9,7 @@
  *                                                                            *
  *                     Start Date : February 10, 2023                         *
  *                                                                            *
- *                    Last Update :                                           *
+ *                    Last Update : February 22, 2023                         *
  *                                                                            *
  * -------------------------------------------------------------------------- *
  * Over View:                                                                 *
@@ -76,6 +76,7 @@ static int _encrypt_parse_args(int argc, char* argv[], std::string& src, std::st
 			break;
 		case '?':
 			cnsl::InsertText(ERROR_COLOR, "Unknown parameter \"-%c\"\n", optopt);
+			err = 2;	// Should not proceed if parameter is wrong.
 			break;
 		default:
 			break;
