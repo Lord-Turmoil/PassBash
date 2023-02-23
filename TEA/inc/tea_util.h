@@ -91,7 +91,7 @@ private:
 	FILE* m_input;
 };
 
-// No overflow check! Must teminate with '\0'
+// No overflow check! Must terminate with '\0'
 class TEABufferReader : public TEAReader
 {
 public:
