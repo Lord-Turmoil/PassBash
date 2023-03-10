@@ -9,7 +9,7 @@
  *                                                                            *
  *                     Start Date : January 17, 2023                          *
  *                                                                            *
- *                    Last Update :                                           *
+ *                    Last Update : March 10, 2023                            *
  *                                                                            *
  * -------------------------------------------------------------------------- *
  * Over View:                                                                 *
@@ -171,6 +171,7 @@ void DeleteChildNode(XMLElementPtr node, const char* name);
 void DeleteChildren(XMLElementPtr node);
 
 bool IsParent(XMLElementPtr parent, XMLElementPtr child);
+
 
 /*
 **+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+

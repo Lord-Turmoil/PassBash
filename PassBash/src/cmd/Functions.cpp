@@ -9,7 +9,7 @@
  *                                                                            *
  *                     Start Date : January 17, 2023                          *
  *                                                                            *
- *                    Last Update : January 25, 2023                          *
+ *                    Last Update : March 10, 2023                            *
  *                                                                            *
  * -------------------------------------------------------------------------- *
  * Over View:                                                                 *
@@ -589,4 +589,11 @@ DEC_CMD(unknown)
 DEC_CMD(quit)
 {
 	return 66;
+}
+
+DEC_CMD(version)
+{
+	cnsl::InsertText(FOREGROUND_LIGHT(FOREGROUND_CYAN),
+					 "# Pash Host Version: %s\n", g_PASH_HOST_VERSION);
+	return 0;
 }

@@ -22,9 +22,13 @@
 
 #include "../../inc/cmd/FunctionUtil.h"
 
+#include <vector>
+#include <memory>
 
 static char HOST_IGNORE[] = " ";
 static char HOST_WAITING[] = R"(-\|/)";
+
+static cnsl::InputHistory history;
 
 static void _host_greet()
 {
@@ -70,7 +74,12 @@ static int _host_peek_command()
 
 	cnsl::InsertText(PWD_COLOR, "%s", g_pwd.c_str());
 	cnsl::InsertText(PROMPT_COLOR, "\b$ ");
-	cnsl::GetStringInterruptible(_buffer, 0, CMD_BUFFER_SIZE);
+	
+	cnsl::InputOptions options;
+	options.minLen = 0;
+	options.interruptible = true;
+	options.history = &history;
+	cnsl::GetString(_buffer, options);
 	
 	char* context = nullptr;
 	char* token = strtok_s(_buffer, HOST_IGNORE, &context);

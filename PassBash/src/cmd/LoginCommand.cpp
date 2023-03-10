@@ -41,11 +41,17 @@ static int _receive_password()
 	char buffer[g_PASSWORD_BUFFER_SIZE + 1];
 	int ret = 0;
 
+	cnsl::InputOptions options;
+	options.minLen = 0;
+	options.maxLen = g_PASSWORD_LENGTH;
+	options.decoy = '*';
+	options.interruptible = true;
+
 	cnsl::InsertText(MESSAGE_COLOR, "Please enter your master password.\n");
 	cnsl::InsertText(PROMPT_COLOR, "$ ");
 	do
 	{
-		ret = cnsl::GetPasswordInterruptable(buffer, 0, g_PASSWORD_LENGTH);
+		ret = cnsl::GetString(buffer, options);
 		if (ret == -1)
 			return 1;
 	} while (ret == 0);
@@ -62,7 +68,7 @@ static int _receive_password()
 		cnsl::InsertText(PROMPT_COLOR, "$ ");
 		do
 		{
-			ret = cnsl::GetPasswordInterruptable(buffer, 0, g_PASSWORD_LENGTH);
+			ret = cnsl::GetString(buffer, options);
 			if (ret == -1)
 				return 1;
 		} while (ret == 0);

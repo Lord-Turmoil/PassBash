@@ -74,6 +74,8 @@ DEC_CMD(help)
 	cnsl::InsertText("       remaster -- reset master password\n");
 	cnsl::InsertText("                    usage: remaster\n\n");
 	cnsl::InsertText("        quit, q -- quit PassBash\n");
+	cnsl::InsertText("         change -- change current master password\n");
+	cnsl::InsertText("                    usage: change\n");
 	cnsl::InsertText("            tea -- external tool, encrypt or decrypt file\n");
 	cnsl::InsertText("                    usage: tea [-d] <input file> <output file> [-p password]\n");
 	cnsl::InsertText("                           -d -- to decode file\n");

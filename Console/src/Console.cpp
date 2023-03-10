@@ -203,7 +203,7 @@ void Clear(SHORT left, SHORT right)
 		left++;
 	}
 
-	InsertCarrige();
+	SetCursorPosition(origin);
 }
 
 void Clear(const COORD& upperLeft, const COORD& bottomRight)

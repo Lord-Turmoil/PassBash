@@ -9,7 +9,7 @@
  *                                                                            *
  *                     Start Date : January 16, 2023                          *
  *                                                                            *
- *                    Last Update :                                           *
+ *                    Last Update : March 10, 2023                            *
  *                                                                            *
  * -------------------------------------------------------------------------- *
  * Over View:                                                                 *
@@ -35,6 +35,9 @@
 
 const int g_PASSWORD_BUFFER_SIZE = 32;
 const int g_PASSWORD_LENGTH = 16;
+const int g_PASSWORD_MIN_LENGTH = 6;
+
+extern const char g_PASH_HOST_VERSION[];
 
 extern const char g_default[];
 extern char g_password[];

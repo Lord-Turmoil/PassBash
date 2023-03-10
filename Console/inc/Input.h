@@ -9,7 +9,7 @@
  *                                                                            *
  *                     Start Date : January 1, 2023                           *
  *                                                                            *
- *                    Last Update :                                           *
+ *                    Last Update : March 10, 2023                            *
  *                                                                            *
  * -------------------------------------------------------------------------- *
  * Over View:                                                                 *
@@ -29,17 +29,52 @@
 
 #include <conio.h>
 #include <sstream>
+#include <vector>
 
 _CNSL_BEGIN
 
 const int INPUT_BUFFER_SIZE = 128;
 extern char buffer[INPUT_BUFFER_SIZE];
 
+struct InputHistory
+{
+	InputHistory();
+	~InputHistory();
+
+	void Push(const char* history, size_t pos);
+
+	std::vector<char*> _record;
+};
+
+struct InputOptions
+{
+	int minLen;
+	int maxLen;
+
+	InputHistory* history;
+
+	char decoy;
+	bool interruptible;
+
+	InputOptions() :
+		minLen(1),
+		maxLen(INPUT_BUFFER_SIZE - 1),
+		history(nullptr),
+		decoy(0),
+		interruptible(false)
+	{
+	}
+};
+
 /*
 **+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 ** Input Control
 **+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 */
+int GetString(char* buffer, const InputOptions& options);
+
+// Below are old and deprecated functions.
+
 void GetString(char* buffer);
 void GetString(char* buffer, int minLen, int maxLen);
 // This can be interrupted by ESC or empty input.

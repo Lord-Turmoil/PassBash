@@ -47,8 +47,9 @@ static int _start_init_config()
 DEC_CMD(start)
 {
 	_start_init_console();
-	cnsl::InsertText(FOREGROUND_LIGHT(FOREGROUND_CYAN),
-		"# Pash Host Version: 2.0.4\n\n");
+
+	g_generalFactory.execl("version");
+	cnsl::InsertNewLine();
 
 	_start_init_config();
 

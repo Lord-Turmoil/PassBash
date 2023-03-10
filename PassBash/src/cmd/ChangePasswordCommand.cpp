@@ -33,18 +33,25 @@ static int _authorize()
 	char buffer[g_PASSWORD_BUFFER_SIZE + 1];
 	int ret;
 
+	cnsl::InputOptions options;
+	options.minLen = 0;
+	options.maxLen = g_PASSWORD_LENGTH;
+	options.interruptible = true;
+	options.decoy = '*';
+
 	cnsl::InsertText(MESSAGE_COLOR, "Please enter your old master password.\n");
 	cnsl::InsertText(PROMPT_COLOR, "$ ");
 	do
 	{
-		ret = cnsl::GetPasswordInterruptable(buffer, 0, g_PASSWORD_BUFFER_SIZE);
+		ret = cnsl::GetString(buffer, options);
 		if (ret == -1)
 		{
 			cnsl::InsertNewLine();
-			return 1;
+			return -1;
 		}
 	} while (ret == 0);
 
+	_format_password(buffer);
 	while (_STR_DIFF(g_password, buffer))
 	{
 		cnsl::InsertNewLine();
@@ -57,13 +64,14 @@ static int _authorize()
 		{
 			cnsl::Clear(0);
 			cnsl::InsertText(PROMPT_COLOR, "$ ");
-			ret = cnsl::GetPasswordInterruptable(buffer, 0, g_PASSWORD_BUFFER_SIZE);
+			ret = cnsl::GetString(buffer, options);
 			if (ret == -1)
 			{
 				cnsl::InsertNewLine();
-				return 1;
+				return -1;
 			}
 		} while (ret == 0);
+		_format_password(buffer);
 	}
 
 	cnsl::InsertNewLine();
@@ -76,6 +84,10 @@ static int _receive_password()
 {
 	char buffer[g_PASSWORD_BUFFER_SIZE + 1];
 	int ret;
+
+	cnsl::InputOptions options;
+	options.minLen = 6;
+	options.maxLen = g_PASSWORD_LENGTH;
 
 	cnsl::InsertText(MESSAGE_COLOR, "Please enter new master password.\n");
 	cnsl::InsertText(MESSAGE_COLOR, "6 to 16 characters, any ascii that is printable.\n");
@@ -115,16 +127,24 @@ static int _reencrypt_data()
 	return 0;
 }
 
+static void _change_abort()
+{
+	cnsl::InsertText(MESSAGE_COLOR, "Aborted! Master password remains!\n");
+}
 
 DEC_CMD(change)
 {
 	_change_greet();
 
-	if (_authorize())
+	int ret = _authorize();
+	if (ret == -1)	// aborted by ESC
 	{
-		if (_receive_password())
-			return _reencrypt_data();
+		_change_abort();
+		return 1;
 	}
+
+	if (_receive_password() == 0)
+		return _reencrypt_data();
 
 	return 2;
 }

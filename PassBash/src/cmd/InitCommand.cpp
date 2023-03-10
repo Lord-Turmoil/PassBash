@@ -9,7 +9,7 @@
  *                                                                            *
  *                     Start Date : January 25, 2023                          *
  *                                                                            *
- *                    Last Update :                                           *
+ *                    Last Update : March 10, 2023                            *
  *                                                                            *
  * -------------------------------------------------------------------------- *
  * Over View:                                                                 *
@@ -34,6 +34,7 @@ void init_factory()
 	// general
 	HOOKC(g_generalFactory, cd);
 	HOOKC(g_generalFactory, ls);
+	HOOKD(g_generalFactory, "l", ls);
 	HOOKC(g_generalFactory, touch);
 	HOOKC(g_generalFactory, mkdir);
 	HOOKC(g_generalFactory, rm);
@@ -52,6 +53,7 @@ void init_factory()
 	HOOKC(g_generalFactory, help);
 	HOOKD(g_generalFactory, "h", help);
 	HOOKC(g_generalFactory, find);
+	HOOKD(g_generalFactory, "f", find);
 	HOOKC(g_generalFactory, edit);
 	HOOKD(g_generalFactory, "mod", edit);
 	HOOKC(g_generalFactory, quit);
@@ -59,6 +61,8 @@ void init_factory()
 	HOOKC(g_generalFactory, order);
 	HOOKC(g_generalFactory, change);
 	HOOKD(g_generalFactory, "tea", encrypt);
+	HOOKC(g_generalFactory, version);
+	HOOKD(g_generalFactory, "ver", version);
 
 	// editor
 	HOOKC(g_editorFactory, _edit);

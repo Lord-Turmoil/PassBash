@@ -48,7 +48,11 @@ static void _receive_password()
 
 	cnsl::InsertText("6 to 16 characters, any ascii that is printable.\n");
 	cnsl::InsertText(PROMPT_COLOR, "$ ");
-	cnsl::GetString(buffer, 6, g_PASSWORD_LENGTH);
+
+	cnsl::InputOptions options;
+	options.minLen = 6;
+	options.maxLen = g_PASSWORD_LENGTH;
+	cnsl::GetString(buffer, options);
 	cnsl::InsertNewLine();
 	_format_password(buffer, g_password);
 }

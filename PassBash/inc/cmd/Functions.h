@@ -64,6 +64,9 @@ DEC_CMD(edit);
 // tea [-u] <src> <dst> <password>
 DEC_CMD(encrypt);
 
+// version, ver
+DEC_CMD(version);
+
 /*
 **+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 ** Hidden Command

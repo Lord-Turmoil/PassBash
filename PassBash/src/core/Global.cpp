@@ -23,6 +23,8 @@
 #include "../../inc/core/Global.h"
 #include "../../inc/core/Config.h"
 
+const char g_PASH_HOST_VERSION[] = "2.1.0";
+
 const char g_default[g_PASSWORD_BUFFER_SIZE] = "null";
 char g_password[g_PASSWORD_BUFFER_SIZE];
 
